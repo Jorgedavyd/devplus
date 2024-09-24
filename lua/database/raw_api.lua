@@ -1,5 +1,10 @@
 local config = require("lua.obsidian.config")
 local builtin = require("telescope.builtin")
+local data = require("utils")
+
+---@class RawAPI
+---@field GET function
+---@field POST function
 local M = {}
 
 ---@type string

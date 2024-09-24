@@ -1,6 +1,7 @@
 local raw_api = require("lua.database.raw_api")
 ---@class Metrics
 ---@field file string Filepath of the current metric
+
 local M = {}
 
 M.
