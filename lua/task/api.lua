@@ -3,7 +3,12 @@ local M = {}
 
 ---@return nil
 function M.write()
-    local file = vim.api.file()
+
+end
+
+---@return boolean
+function M.database()
+
 end
 
 return M
