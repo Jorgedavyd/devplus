@@ -1,15 +1,20 @@
----@alias task {file?:string, lines?: number}
 ---@class Encoder
----@field Obsidian
----@field Inline
+---@field obsidian function
+---@field inline function
 local M = {}
 
-function M.Obsidian()
+---@param task string
+function M.obsidian(task)
 
 end
 
----@param opt task
-function M.Inline(opt)
+---@param task string
+function M.inline(task)
+
+end
+
+---@param task string
+function M.buffer(task)
 
 end
 

@@ -1,5 +1,5 @@
 ---@alias logs fun(msg: string): nil
----@class Utils
+---@class Logs
 ---@field warning logs
 ---@field error logs
 local M = {}

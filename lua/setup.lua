@@ -10,5 +10,9 @@ local database = require("database")
 ---@field keymaps function
 local M = {}
 
+function M.forward(opts)
+    M.
+end
+
 return M
 

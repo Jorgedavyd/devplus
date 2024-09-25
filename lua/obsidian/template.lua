@@ -55,10 +55,10 @@ not done
 ]]
 
 M.todo_default = {
-    "{{PATH_PLACEHOLDER}}": "path",
-    "{{TASK_PLACEHOLDER}}": "task",
-    "{{LANGUAGE_PLACEHOLDER}}": "language",
-    "{{CODE_BLOCK_PLACEHOLDER}}": "code",
+    ["{{PATH_PLACEHOLDER}}"] = "path",
+    ["{{TASK_PLACEHOLDER}}"] = "task",
+    ["{{LANGUAGE_PLACEHOLDER}}"] = "language",
+    ["{{CODE_BLOCK_PLACEHOLDER}}"] = "code",
 }
 
 return M

@@ -1,4 +1,3 @@
-require("daily_api")
-require("")
+require("daily")
 require("raw")
 require("metrics")

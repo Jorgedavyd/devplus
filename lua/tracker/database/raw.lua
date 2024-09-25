@@ -1,4 +1,4 @@
----@class DailyAPI
+---@class RawAPI
 ---@field GET function
 ---@field POST function
 local M = {}
@@ -10,5 +10,7 @@ end
 function M.POST()
 
 end
+
+return M
 
 

@@ -9,6 +9,22 @@
   </p>
 </div>
 
-The goal of **devplus** is to provide a non-blocking framework towards developer productivity, enhancing the coding experience by seamlessly automating the interaction between Obsidian and Neovim.
+The goal of **devplus** is to provide a non-blocking framework towards developer productivity, enhancing the coding experience by seamlessly automating the interaction between Obsidian and Neovim, provide the user a versatile way to display tasks, suitable for a variety of productivity frameworks, and constant tracking of coding metrics for data informed analytics on your actionable patterns.
 
-Developer utilities for productivity. Todo and Metric Tracker synchronized with [Obsidian](https://obsidian.md/)
+# Summary
+The **devplus** plugin consists on:
+1. Versatile task management for a variety of **triggers**.
+2. Constant tracking of buffer timings, task completion, lines of code created, among others.
+3. Synchronization with [Obsidian](https://obsidian.md/) **GET** and **POST** for Tasks.
+
+# License
+
+This project is licensed under the Apache 2.0 License - see the LICENSE file for details.
+
+# Contact
+
+- [Linkedin](https://www.linkedin.com/in/jorge-david-enciso-mart%C3%ADnez-149977265/)
+- Email: jorged.encyso@gmail.com
+- [GitHub](https://github.com/Jorgedavyd)
+
+
