@@ -1,4 +1,4 @@
----@class Status
+--task-@class Status
 ---@field update function
 ---@field self boolean
 local M = {}
@@ -14,7 +14,5 @@ function M.update()
     end
     return M
 end
-
---- set autocmd
 
 return M

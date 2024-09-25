@@ -1,8 +1,6 @@
-local async = require("plenary.async").async
-local await = require("plenary.async").await
-local filter = require("filter")
-local buffer = require("buffer")
 local logs = require("logs")
+local buffer = require("buffer")
+local filter = require("filter")
 local api = vim.api
 
 ---@alias WinMatrix table<number, table<number, table<string, string|number>>>
@@ -79,17 +77,11 @@ end
 ---@return nil
 function M.setWindows()
     M.assert(M.config)
-    local tasks = {}
-    for _, opts in ipairs(M.getWindowOpts(M.config)) do
-        table.insert(tasks, async(function ()
-            await(vim.schedule_wrap(function ()
-                local win = vim.api.nvim_open_win(buffer.buf, true, opts)
-                api.nvim_win_set_buf(win, buffer.buf)
-                --- filter
-            end)
-        end)))
+    for idx, opts in ipairs(M.getWindowOpts(M.config)) do
+        api.nvim_win_set_buf(idx, buffer.buf)
+        local win = vim.api.nvim_open_win(buffer.buf, true, opts)
+
     end
-    return tasks
 end
 
 return M
