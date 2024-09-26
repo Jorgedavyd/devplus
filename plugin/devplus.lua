@@ -7,6 +7,6 @@ vim.api.nvim_create_user_command('ToggleTasks', function()
 
 end, {})
 
-vim.api.nvim_create_user_command('ToggleTracker', function()
+vim.api.nvim_create_user_command('ToggleTodayTracker', function()
 
 end, {})

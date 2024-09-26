@@ -31,7 +31,7 @@ M.tasks = {
                 due_date DATETIME,
                 description TEXT,
                 priority INTEGER,
-                status BIT,
+                ai BIT,
                 finish_date DATETIME,
                 FOREIGN KEY(category) REFERENCES category_id(id) ON DELETE CASCADE,
                 FOREIGN KEY(file) REFERENCES file_id(id) ON DELETE CASCADE,
