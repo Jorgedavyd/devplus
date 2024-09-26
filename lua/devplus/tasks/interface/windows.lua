@@ -1,3 +1,4 @@
+local config = require("setup").config.windows
 local async = require("plenary.async").async
 local await = require("plenary.async").await
 local filter = require("filter")
@@ -11,35 +12,34 @@ local api = vim.api
 ---@field setWindows function
 local M = {}
 
----@type Config
-M.config = {}
+M.config = config
 
 ---@private
----@param config Config | table <number, Filter>
+---@param opts Config | table <number, Filter>
 ---@return nil
-function M.assert(config)
-    if type(config[1]) == "table" then
-        for _, ops in pairs(config) do
+function M.assert(opts)
+    if type(opts[1]) == "table" then
+        for _, ops in pairs(opts) do
             return M.assert(ops)
         end
-    elseif type(config[1]) == "function" then
-        for idx, func in ipairs(config) do
+    elseif type(opts[1]) == "function" then
+        for idx, func in ipairs(opts) do
             if !filter.isFilterFunction(func) then
-                logs.error("Not valid function at function" .. idx .. " in windows config, expected a function(task) -> boolean")
+                logs.error("Not valid function at function" .. idx .. " in windows opts, expected a function(task) -> boolean")
             end
         end
     else
-        logs.error("Not valid configuration table for windows")
+        logs.error("Not valid optsuration table for windows")
     end
 end
 
 ---@private
----@param config Config
+---@param opts Config
 ---@return nil
-function M.matrixAssert(config)
-    if type(config[0]) == "table" then
-        for i=1,#config - 1 do
-            if (#(config[i]) ~= #(config[i+1])) then
+function M.matrixAssert(opts)
+    if type(opts[0]) == "table" then
+        for i=1,#opts - 1 do
+            if (#(opts[i]) ~= #(opts[i+1])) then
                 logs.error("Config should be a grid of NxM with no void spaces.")
             end
         end
@@ -47,16 +47,16 @@ function M.matrixAssert(config)
 end
 
 ---@private
----@param config Config
+---@param opts Config
 ---@return WinMatrix
-function M.getWindowOpts(config, idx, row_size)
+function M.getWindowOpts(opts, idx, row_size)
     local positions = {}
-    local range = #config
-    if type(config[1]) == "table" then
+    local range = #opts
+    if type(opts[1]) == "table" then
         assert(type(idx) == "nil", "Not valid keyword idx for nested table")
         assert(type(row_size) == "nil", "Not valid keyword len for nested table")
         for i=1,range do
-            table.insert(positions, M.getWindowOpts(config, i, range))
+            table.insert(positions, M.getWindowOpts(opts, i, range))
         end
     else
         local height, width = vim.o.lines, math.floor(vim.o.columns * 5 / 8)
@@ -78,9 +78,9 @@ end
 
 ---@return nil
 function M.setWindows()
-    M.assert(M.config)
+    M.assert(config)
     local tasks = {}
-    for _, opts in ipairs(M.getWindowOpts(M.config)) do
+    for _, opts in ipairs(M.getWindowOpts(config)) do
         table.insert(tasks, async(function ()
             await(vim.schedule_wrap(function ()
                 local win = vim.api.nvim_open_win(buffer.buf, true, opts)

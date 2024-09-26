@@ -15,6 +15,22 @@ function M.update()
     return M
 end
 
+M.interface = {
+    init = function ()
+    end,
+    deinit = function ()
+    end,
+    window = function ()
+    end,
+    buffer = {
+    }
+}
+
+---@return nil
+function M.
+
+end
+
 --- set autocmd
 
 return M

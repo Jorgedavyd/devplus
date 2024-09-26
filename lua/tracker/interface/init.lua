@@ -1,8 +1,0 @@
-require("buffer")
-require("cache")
-require("config")
-require("filter")
-require("front")
-require("matrix")
-require("status")
-require("windows")

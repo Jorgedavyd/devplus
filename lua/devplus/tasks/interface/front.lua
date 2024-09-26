@@ -1,23 +1,26 @@
-local config = require("default")
+local config = require("setup").config.prettier
 local api = vim.api
 
 ---@class Prettier
----@field signs table<string, string>
+
 local M = {}
 
 ---@type table<string, string>
-M.config = config.prettier
+M.config = config
 
 ---@type number | nil
 M.namespace = nil
 
 function M.init(buffer)
+    M.assert(buffer)
     M.namespace = api.nvim_create_namespace("Prettier")
-
 end
 
-M.motes = {
+---@private
+---@param buffer number
+---@return nil
+function M.assert(buffer)
 
-}
+end
 
 return M

@@ -1,4 +1,3 @@
-require("config")
 require("parser")
 require("api")
 

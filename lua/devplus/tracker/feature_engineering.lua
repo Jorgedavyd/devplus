@@ -1,4 +1,5 @@
 local params = require("params")
+---@alias TaskDailyRecord table <string, number>
 ---@class FeatureEngineering
 ---@field calculate_productivity_score function
 ---@field weighted_harmonic_mean function
@@ -8,7 +9,8 @@ local params = require("params")
 ---@field calculate_time_management_index function
 local M = {}
 
----@param task table <string, string|number>
+
+---@param task TaskDailyRecord
 ---@return nil
 function M.calculate_productivity_score(task)
     if task.total_time_spent > 0 then
@@ -30,7 +32,7 @@ function M.weighted_harmonic_mean(x1, x2, a, b)
     return (x1 + x2) / (1/x1 + 1/x2)
 end
 
----@param task table <string, string|number>
+---@param task TaskDailyRecord
 ---@return number
 function M.calculate_efficiency_ratio(task)
     if task.estimated_time > 0 then
@@ -40,7 +42,7 @@ function M.calculate_efficiency_ratio(task)
     end
 end
 
----@param task table <string, string|number>
+---@param task TaskDailyRecord
 ---@return number
 function M.calculate_task_completion_rate(task)
     if task.total_tasks > 0 then
@@ -50,7 +52,7 @@ function M.calculate_task_completion_rate(task)
     end
 end
 
----@param task table <string, string|number>
+---@param task TaskDailyRecord
 ---@return number
 function M.calculate_priority_alignment(task)
     if task.total_tasks > 0 then
@@ -60,7 +62,7 @@ function M.calculate_priority_alignment(task)
     end
 end
 
----@param task table <string, string|number>
+---@param task TaskDailyRecord
 ---@return number
 function M.calculate_time_management_index(task)
     local planned_time = task.estimated_time or 0
@@ -72,7 +74,7 @@ function M.calculate_time_management_index(task)
     end
 end
 
----@param task table <string, string|number>
+---@param task TaskDailyRecord
 ---@return table <string, number>
 function M.compute(task)
     local metrics = {}

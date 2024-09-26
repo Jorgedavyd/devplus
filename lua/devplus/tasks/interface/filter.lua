@@ -1,7 +1,6 @@
 ---@alias Filter fun(value: string): boolean
 ---@class FiltUtils
 ---@field isFilter function
-
 local M = {}
 
 ---@param func function

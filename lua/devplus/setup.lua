@@ -1,8 +1,3 @@
-local tasks = require("tasks")
-local tracker = require("tracker")
-local obsidian = require("obsidian")
-local database = require("database")
-
 ---@class Setup
 ---@field windows table<string|number, function>
 ---@field buffer table<number, ...>
@@ -10,8 +5,25 @@ local database = require("database")
 ---@field keymaps function
 local M = {}
 
+M.default = {
+    prettier = {
+
+    },
+    windows = {
+
+    },
+    keymaps = {
+
+    },
+    vault = "~",
+    project = "projects/",
+}
+
+
+M.config = nil
+
 function M.forward(opts)
-    M.
+    M.config = vim.tbl_deep_extend('force', opts, M.default)
 end
 
 return M

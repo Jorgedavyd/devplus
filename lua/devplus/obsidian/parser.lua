@@ -1,5 +1,6 @@
 local todo_template = require("template").todo
 local motes = require("taskMotes")
+
 ---@class ObsidianParser
 ---@field singleTaskParser function
 ---@field assert function
