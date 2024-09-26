@@ -4,10 +4,11 @@ local sqlite3 = require('lsqlite3')
 ---@field POST function
 local M = {}
 
-M.database = sqlite3.open(vim.fn.stdpath('data') .. '/devplus.db')
+M.database = nil
 
----@private
----@return table<string, function>
+function M.init()
+    M.database = sqlite3.open(vim.fn.stdpath('data') .. '/devplus.db')
+end
 
 M.categories = {
     init = function ()
@@ -60,8 +61,21 @@ M.files = {
             id INTEGER PRIMARY KEY,
             project INTEGER,
             name TEXT,
-            FOREIGN KEY(project) REFERENCES project_id(id) ON DELETE CASCADE
+            language INTEGER,
+            FOREIGN KEY(project) REFERENCES project_id(id) ON DELETE CASCADE,
+            FOREIGN KEY(language) REFERENCES language_id(id) ON DELETE CASCADE
         );
+        ]]
+    end
+}
+
+M.language = {
+    init = function ()
+        M.database:exec[[
+            CREATE TABLE IS NOT EXISTS language,
+            id INTEGER PRIMARY KEY,
+            extension TEXT,
+            name TEXT
         ]]
     end
 }
@@ -123,7 +137,7 @@ M.editing_time = {
 }
 
 
-M.breaks = {
+M.breaks = { --- Non ptr intervals
     init = function ()
         M.database:exec[[
             CREATE TABLE IF NOT EXISTS break_record (

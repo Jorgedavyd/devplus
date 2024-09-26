@@ -1,3 +1,4 @@
+local plot = require('tracker.plot')
 ---@class Setup
 ---@field windows table<string|number, function>
 ---@field buffer table<number, ...>
@@ -6,20 +7,30 @@
 local M = {}
 
 M.default = {
-    prettier = {
-
+    keymaps = function ()
+    end,
+    vault = nil,
+    project = nil,
+    tasks= {
+        windows = {
+        },
+        prettier = {
+        },
+        categories = {
+        },
     },
-    windows = {
-
+    tracker = {
+        aggregation = {
+            plot.create()
+        }, --- look at the features to pick from to create your own tracker
     },
-    keymaps = {
-
-    },
-    vault = "~",
-    project = "projects/",
+    methods = {
+        weight = function ()
+        end,
+    }
 }
 
-
+---@type table<string, function|string|table>
 M.config = nil
 
 function M.forward(opts)
