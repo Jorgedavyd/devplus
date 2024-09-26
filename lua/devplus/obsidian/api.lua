@@ -3,10 +3,8 @@ local config = require("setup").config
 
 local M = {}
 
----@private
----@return string
-function M.getPath()
-    return vim.fn.resolve(config.vault .. config.project .. "todo.md");
+function M.showObsidianTasks()
+    --- setup watch dog
 end
 
 return M

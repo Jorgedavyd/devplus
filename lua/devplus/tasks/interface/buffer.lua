@@ -1,5 +1,5 @@
 local prettier = require("tasks.interface.front")
-local setup = require("setup")
+local keymaps = require("setup").config.buffer_keymaps
 local api = vim.api
 
 ---@class Buffer
@@ -17,13 +17,16 @@ function M.init()
     api.nvim_buf_set_option(M.buf, 'buftype', 'nofile')
     --- import tasks
     prettier.init(M.buf)
-    setup.set_buffer_keymaps(M.buf)
-    --- autocmd on manual deletion and adding supreme from buffer
+    keymaps(M.buf)
 end
+
+--- API
 
 function M.reset()
     api.nvim_buf_delete(M.buf)
     M.init()
 end
+
+
 
 return M

@@ -1,5 +1,6 @@
 local todo_template = require("template").todo
 local motes = require("taskMotes")
+local config = require("setup").config.tasks
 
 ---@class ObsidianParser
 ---@field singleTaskParser function
@@ -8,7 +9,6 @@ local motes = require("taskMotes")
 ---@field singleBlockParser function
 local M = {}
 
----@private
 ---@param due_date string
 ---@param priority string
 ---@param description string
@@ -17,7 +17,6 @@ function M.singleTaskParser(due_date, priority, description)
     return ("- [ ] %s %s%s %s%s"):format(description, motes.due_date, due_date, motes.priority[priority] ,priority)
 end
 
----@private
 ---@param task table <string,string>
 ---@return nil
 function M.assert(task)
@@ -31,7 +30,6 @@ function M.task(task)
     return M.singleTaskParser(task.due_date, task.priority, task.description)
 end
 
----@private
 ---@param s string
 ---@param match string
 ---@param value ?string
@@ -46,7 +44,6 @@ function string.replace(s,match,value)
 
 end
 
----@private
 ---@param task table <string, string>
 ---@return table <string, string>
 function M.singleBlockParser(task)

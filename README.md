@@ -17,6 +17,14 @@ The **devplus** plugin consists on:
 2. Constant tracking of buffer timings, task completion, lines of code created, among others.
 3. Synchronization with [Obsidian](https://obsidian.md/) **GET** and **POST** for Tasks.
 
+# Setup
+```lua
+return {
+    'Jorgedavyd/devplus',
+    config = ,
+}
+```
+
 # License
 
 This project is licensed under the Apache 2.0 License - see the LICENSE file for details.

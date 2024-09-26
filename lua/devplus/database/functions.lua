@@ -19,3 +19,4 @@ function M.create(func)
     log.error("Database not initialized properly for feature engineering")
 end
 
+return M

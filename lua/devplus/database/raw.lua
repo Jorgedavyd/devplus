@@ -34,10 +34,23 @@ M.tasks = {
                 priority INTEGER,
                 ai BIT,
                 finish_date DATETIME,
+                source INTEGER,
                 FOREIGN KEY(category) REFERENCES category_id(id) ON DELETE CASCADE,
                 FOREIGN KEY(file) REFERENCES file_id(id) ON DELETE CASCADE,
+                FOREIGN KEY(source) REFERENCES source_id(id) ON DELETE CASCADE,
                 FOREIGN KEY(priority) REFERENCES priority_id(id) ON DELETE CASCADE
             );
+        ]]
+    end
+}
+
+M.sources = {
+    init = function ()
+        M.database:exec[[
+            CREATE TABLE IF NOT EXISTS source_id (
+                id INTEGER PRIMARY KEY,
+                name TEXT,
+        );
         ]]
     end
 }

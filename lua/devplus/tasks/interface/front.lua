@@ -20,7 +20,6 @@ end
 ---@param buffer number
 ---@return nil
 function M.assert(buffer)
-
 end
 
 return M

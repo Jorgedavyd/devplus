@@ -1,3 +1,4 @@
+local prettier = require("tasks.interface.front")
 ---@class PtrTask
 ---@field init function
 local M = {}

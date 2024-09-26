@@ -53,9 +53,8 @@ function M.plot_assert(filters, opts)
 end
 
 function M.create_plots(filters, opts)
-
     for name, filter in pairs(filters) do
-        vim.fn.SeabornPlot(opts.width, opts.height, name, data)
+        vim.fn.SeabornPlot(opts.width, opts.height, name)
     end
 end
 
@@ -70,3 +69,5 @@ function M.toggle_plot(filters, opts)
         end
     end
 end
+
+return M
