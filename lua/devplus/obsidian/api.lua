@@ -1,5 +1,5 @@
-local parser = require("parser")
-local config = require("setup").config
+local parser = require("devplus.parser")
+local config = require("devplus.setup").config
 
 local M = {}
 

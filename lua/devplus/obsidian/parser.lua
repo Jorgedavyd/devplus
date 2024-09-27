@@ -1,6 +1,5 @@
 local todo_template = require("template").todo
 local motes = require("taskMotes")
-local config = require("setup").config.tasks
 
 ---@class ObsidianParser
 ---@field singleTaskParser function

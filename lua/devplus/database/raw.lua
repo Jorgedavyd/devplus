@@ -8,6 +8,17 @@ M.database = nil
 
 function M.init()
     M.database = sqlite3.open(vim.fn.stdpath('data') .. '/devplus.db')
+    M.categories.init()
+    M.sources.init()
+    M.priority.init()
+    M.language.init()
+    M.projects.init()
+    M.breaks.init()
+    M.files.init()
+    M.buffer_records.init()
+    M.tasks.init()
+    M.editing_time.init()
+    M.ptr_records.init()
 end
 
 M.categories = {

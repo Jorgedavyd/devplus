@@ -1,7 +1,7 @@
-local ptr = require("ptr")
 local encoder = require("encoder")
 local decoder = require("decoder")
 local logs = require("logs")
+local ptr = require("ptr")
 
 ---@class Task
 ---@field ptr? PtrTask

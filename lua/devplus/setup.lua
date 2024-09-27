@@ -1,3 +1,4 @@
+local api = require('devplus.tracker.api')
 ---@class Setup
 ---@field windows table<string|number, function>
 ---@field buffer table<number, ...>
@@ -14,31 +15,42 @@ M.default = {
     },
     tasks= {
         windows = {
-            {
-                function (task)
-                    return (task.priority == 'high') and (task.due_date < os.date() + os.date(days = 5))
-                end,
-                function (task)
-                    return (task.priority == 'high') and (task.due_date > os.date() + os.date(days = 5))
-                end,
+            filters = {
+                {
+                    function (task)
+                        return (task.priority == 'high') and (task.due_date < os.date() + os.date(days = 5))
+                    end,
+                    function (task)
+                        return (task.priority == 'high') and (task.due_date > os.date() + os.date(days = 5))
+                    end,
+                },
+                {
+                    function (task)
+                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date < os.date() + os.date(days = 5))
+                    end,
+                    function (task)
+                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date > os.date() + os.date(days = 5))
+                    end,
+                }
             },
-            {
-                function (task)
-                    return (task.priority == 'low' or task.priority == 'medium') and (task.due_date < os.date() + os.date(days = 5))
-                end,
-                function (task)
-                    return (task.priority == 'low' or task.priority == 'medium') and (task.due_date > os.date() + os.date(days = 5))
-                end,
+            config = {
+                relative = 'editor',
+                style = 'minimal',
+                border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
             }
         },
         categories = {
-            TRAIN = "", ---shoutout to folke for these icons
-            DATA = ""
+            TODO = "" ---shoutout to folke for these icons
         },
+        time_format = "%y%m%d"
     },
     tracker = {
-        db_functions = {
+        sql_functions = {
+
         },
+        visualization = {
+            api.tracker.visualization.bar(x = [[]], y = [[]])
+        }
     },
     llm = {
         type = "", --- Look at supported models (if there's not one of yours, you can implement it yourself)

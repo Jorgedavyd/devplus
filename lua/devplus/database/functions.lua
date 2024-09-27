@@ -1,5 +1,5 @@
-local db = require("raw").database
-local log = require("logs")
+local db = require("devplus.database.raw").database
+local log = require("devplus.logs")
 ---@class DatabaseFunctions
 ---@field create function
 local M = {}
@@ -17,6 +17,25 @@ function M.create(func)
         end)
     end
     log.error("Database not initialized properly for feature engineering")
+end
+
+---@param functions table<number, function>
+---@return nil
+function M.init(functions)
+    M.assert(functions)
+    for _, func in ipairs(functions) do
+        M.create(func)
+    end
+end
+
+---@param functions table<number, function>
+---@return nil
+function M.assert(functions)
+    for _, func in ipairs(functions) do
+        if type(func) ~= 'function' then
+            log.error("Not valid parameter db_functions, must be a list of functions")
+        end
+    end
 end
 
 return M

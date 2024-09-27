@@ -1,4 +1,5 @@
-local setup = require("setup")
+require("devplus.autocmd")
+local setup = require("devplus.setup")
 
 local M = {}
 

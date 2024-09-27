@@ -1,5 +1,5 @@
-local buffer = require("tasks.interface.buffer")
-local prettier = require("tasks.interface.front")
+local buffer = require("devplus.tasks.interface.buffer")
+local prettier = require("devplus.tasks.interface.front")
 
 local M = {}
 
@@ -12,15 +12,15 @@ function M.tasks.access_task()
 end
 
 ---@return nil
-function M.tasks.pointer()
+function M.tasks.toggle_pointer()
 end
 
 ---@return nil
-function M.tasks.toggle_task()
+function M.tasks.toggle_checkmark()
     local current_line = vim.fn.line('.') - 1
     local extmarks = vim.api.nvim_buf_get_extmarks(buffer.buf, prettier.namespace, {current_line, 0}, {current_line, -1}, {})
-    local uncompleted_mark = "[ ] "
-    local completed_mark = "[x] "
+    local uncompleted_mark = "☐"
+    local completed_mark = "☑"
 
     if #extmarks > 0 then
         -- If an extmark exists, toggle its state

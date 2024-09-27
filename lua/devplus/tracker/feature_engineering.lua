@@ -1,4 +1,3 @@
-local params = require("params")
 ---@alias TaskDailyRecord table <string, number>
 ---@class FeatureEngineering
 ---@field calculate_productivity_score function
@@ -18,15 +17,6 @@ function M.calculate_productivity_score(total_time_spent, tasks_solved, avg_prio
         productivity_score = 0
     end
     return productivity_score
-end
-
----@return number
-function M.weighted_harmonic_mean(x1, x2, a, b)
-    a = a or params.alpha
-    b = b or params.beta
-    x1 = x1 * a
-    x2 = x2 * b
-    return (x1 + x2) / (1/x1 + 1/x2)
 end
 
 ---@return number
@@ -66,5 +56,13 @@ function M.calculate_time_management_index(estimated_time, total_time_spent)
         return 0
     end
 end
+
+M.list = {
+    M.calculate_productivity_score,
+    M.calculate_efficiency_ratio,
+    M.calculate_task_completion_rate,
+    M.calculate_priority_alignment,
+    M.calculate_time_management_index,
+}
 
 return M

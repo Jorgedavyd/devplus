@@ -1,12 +1,9 @@
-local config = require("setup").config.prettier
+local config = require("devplus.setup").tasks.categories
 local api = vim.api
 
 ---@class Prettier
 
 local M = {}
-
----@type table<string, string>
-M.config = config
 
 ---@type number | nil
 M.namespace = nil

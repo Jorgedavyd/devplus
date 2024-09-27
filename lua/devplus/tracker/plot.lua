@@ -1,6 +1,6 @@
-local config = require("setup").config.tracker.agg
+local config = require("devplus.setup").config.tracker.agg
 local image = require("image")
-local log = require("logs")
+local log = require("devplus.logs")
 ---@class Plotter
 local M = {}
 
