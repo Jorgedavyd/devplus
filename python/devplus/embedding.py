@@ -19,4 +19,3 @@ class Embedding:
                 return embeddings.mean(dim=1)
         elif isinstance(x, list):
             return [self.__call__(i) for i in x]
-

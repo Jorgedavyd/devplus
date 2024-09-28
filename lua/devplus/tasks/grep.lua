@@ -1,5 +1,3 @@
-local log = require("devplus.logs")
-local config = require("devplus.setup").tasks.categories
 local api = vim.api
 local M = {}
 

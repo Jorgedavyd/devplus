@@ -5,7 +5,7 @@ local M = {}
 ---@type table <string, string>
 M.priority = {
     low = "🔽",
-    mid = "🔼",
+    medium = "🔼",
     high = "⏫"
 }
 

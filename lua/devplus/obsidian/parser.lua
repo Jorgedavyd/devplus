@@ -16,19 +16,6 @@ function M.singleTaskParser(due_date, priority, description)
     return ("- [ ] %s %s%s %s%s"):format(description, motes.due_date, due_date, motes.priority[priority] ,priority)
 end
 
----@param task table <string,string>
----@return nil
-function M.assert(task)
-    assert (task.priority and task.description and task.due_date)
-end
-
----@param task table <string,string>
----@return string
-function M.task(task)
-    M.assert(task)
-    return M.singleTaskParser(task.due_date, task.priority, task.description)
-end
-
 ---@param s string
 ---@param match string
 ---@param value ?string

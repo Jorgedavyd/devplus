@@ -1,6 +1,5 @@
-local config = require("devplus.setup").config.tracker.agg
-local image = require("image")
 local log = require("devplus.logs")
+local image = require("image")
 ---@class Plotter
 local M = {}
 
@@ -14,7 +13,7 @@ function M.getImagePos(filters, idx, row_size)
         assert(type(idx) == "nil", "Not valid keyword idx for nested table")
         assert(type(row_size) == "nil", "Not valid keyword len for nested table")
         for i=1,range do
-            table.insert(positions, M.getImageOpts(filters, i, range))
+            table.insert(positions, M.getImagePos(filters, i, range))
         end
     else
         local height, width = vim.o.lines, math.floor(vim.o.columns * 5 / 8)
@@ -62,7 +61,7 @@ function M.toggle_plot(filters, opts)
     M.plot_assert(filters, opts)
     for i=1,#opts do
         if type(filters[i]) == 'table' then
-            M.toggle_plot(opts[i])
+            M.toggle_plot(filters[i], opts[i])
         elseif type(filters[i]) == 'function' then
             M.show({
             })

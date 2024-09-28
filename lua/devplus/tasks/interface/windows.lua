@@ -2,7 +2,7 @@ local setup = require("devplus.setup")
 local async = require("plenary.async").async
 local await = require("plenary.async").await
 local filter = require("devplus.tasks.interface.filter")
-local buffer = require("devplus.buffer")
+local buffer = require("devplus.tasks.interface.buffer")
 local logs = require("devplus.logs")
 local api = vim.api
 ---@alias Config table<number, Filter> | table<number, table<number, Filter>>
@@ -91,10 +91,22 @@ end
 M.windows = {}
 
 ---@return nil
-function M.setWindows()
+function M.init()
     M.assert(setup.windows)
+    local configs = M.getWindowsConfig(setup.windows.filters)
     local tasks = {}
-    for _, opts in ipairs(M.getWindowOpts(setup.windows.filters)) do
+    for idx=1, #configs do
+        table.insert(tasks, async(function ()
+            await(vim.schedule_wrap(function ()
+                local win = vim.api.nvim_open_win(buffer.buf, true, opts)
+                api.nvim_win_set_buf(win, buffer.buf)
+                local filtered = filter.create(buffer.buf, opts.filter)
+                table.insert(M.windows, win)
+            end)
+        end)))
+    end
+    local tasks = {}
+    for _, opts in ipairs(M.getWindowsConfig(setup.windows.filters)) do
         table.insert(tasks, async(function ()
             await(vim.schedule_wrap(function ()
                 local win = vim.api.nvim_open_win(buffer.buf, true, opts)

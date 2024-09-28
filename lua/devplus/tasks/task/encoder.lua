@@ -10,13 +10,15 @@ local M = {}
 ---@return Task
 function M.default(task, pattern)
     local group = string.match(task, pattern)
+    local category = group[1]
     local due_date = os.date(config.time_format, group[2])
     local priority = group[3]
     local description = group[4]
     return {
-        due_date,
-        priority:lower(),
-        description
+        category = category:upper(),
+        due_date = due_date,
+        priority = priority:lower(),
+        description = description
     }
 end
 

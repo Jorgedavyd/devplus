@@ -1,4 +1,5 @@
 local api = require('devplus.tracker.api')
+local database = require("devplus.database")
 ---@class Setup
 ---@field windows table<string|number, function>
 ---@field buffer table<number, ...>
@@ -18,18 +19,18 @@ M.default = {
             filters = {
                 {
                     function (task)
-                        return (task.priority == 'high') and (task.due_date < os.date() + os.date(days = 5))
+                        return (task.priority == 'high') and (task.due_date < os.time(os.date("*t")) + )
                     end,
                     function (task)
-                        return (task.priority == 'high') and (task.due_date > os.date() + os.date(days = 5))
+                        return (task.priority == 'high') and (task.due_date > os.date() + os.time(day = 5))
                     end,
                 },
                 {
                     function (task)
-                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date < os.date() + os.date(days = 5))
+                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date < os.date() + os.time(day = 5))
                     end,
                     function (task)
-                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date > os.date() + os.date(days = 5))
+                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date > os.date() + os.time(day = 5))
                     end,
                 }
             },
@@ -42,7 +43,8 @@ M.default = {
         categories = {
             TODO = "" ---shoutout to folke for these icons
         },
-        time_format = "%y%m%d"
+        time_format = "%y%m%d",
+        ptr_virtual_text= "->"
     },
     tracker = {
         sql_functions = {
@@ -63,6 +65,9 @@ M.config = nil
 
 function M.forward(opts)
     M.config = vim.tbl_deep_extend('force', opts, M.default)
+    database.forward(opts.tracker)
+    tasks.forward(opts.tasks)
+    tracker.forward(opts.tracker)
 end
 
 return M
