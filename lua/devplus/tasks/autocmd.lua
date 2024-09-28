@@ -23,12 +23,7 @@ api.nvim_create_autocmd(
         group = M.id,
         desc = "Update buffer on task creation.",
         callback = function (ev)
-            end
         end
     }
 )
-
-function M.ingest_default()
-    --- This function ingest the default data from the category section
-end
 

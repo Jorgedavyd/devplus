@@ -2,9 +2,9 @@ local setup = require("devplus.setup")
 local async = require("plenary.async").async
 local await = require("plenary.async").await
 local filter = require("devplus.tasks.interface.filter")
-local buffer = require("devplus.tasks.interface.buffer")
 local logs = require("devplus.logs")
 local api = vim.api
+
 ---@alias Config table<number, Filter> | table<number, table<number, Filter>>
 ---@alias WinMatrix table<number, string|number|Filter> | table<number, table<number, number|string|Filter>>
 ---@class Windows
@@ -16,7 +16,7 @@ local M = {}
 ---@param config Config | Filter
 ---@return nil
 function M.filter_assert(config)
-    for _, ops in pairs(config) do
+    for idx, ops in ipairs(config) do
         if type(ops) == 'table' then
             M.filter_assert(ops)
         elseif type(ops) == 'function' then
@@ -44,7 +44,6 @@ function M.config_assert(config)
     end
 end
 
----@private
 ---@param config table<string, Config | table<string, string>>
 ---@return nil
 function M.assert(config)
@@ -66,15 +65,17 @@ function M.matrixAssert(opts)
 end
 
 function M.getWindowsConfig(filters, row_size, row, col_size, col)
+    local opts = {}
     if type(filters) == 'table' then
         assert (type(col_size) == 'nil', "Not valid argument row_size")
         for i, op in ipairs(filters) do
             if row_size then
-                return M.getWindowsConfig(op, row_size, row, #filters, i)
+                table.insert(opts, M.getWindowsConfig(op, row_size, row, #filters, i))
             else
-                return M.getWindowsConfig(op, #filters, i)
+                table.insert(opts, M.getWindowsConfig(op, #filters, i))
             end
         end
+        return opts
     elseif type(filters) == "function" then
         local height, width = vim.o.lines, math.floor(vim.o.columns * 5 / 8)
         local shift = vim.o.columns - width
@@ -90,35 +91,6 @@ end
 
 M.windows = {}
 
----@return nil
-function M.init()
-    M.assert(setup.windows)
-    local configs = M.getWindowsConfig(setup.windows.filters)
-    local tasks = {}
-    for idx=1, #configs do
-        table.insert(tasks, async(function ()
-            await(vim.schedule_wrap(function ()
-                local win = vim.api.nvim_open_win(buffer.buf, true, opts)
-                api.nvim_win_set_buf(win, buffer.buf)
-                local filtered = filter.create(buffer.buf, opts.filter)
-                table.insert(M.windows, win)
-            end)
-        end)))
-    end
-    local tasks = {}
-    for _, opts in ipairs(M.getWindowsConfig(setup.windows.filters)) do
-        table.insert(tasks, async(function ()
-            await(vim.schedule_wrap(function ()
-                local win = vim.api.nvim_open_win(buffer.buf, true, opts)
-                api.nvim_win_set_buf(win, buffer.buf)
-                local filtered = filter.create(buffer.buf, opts.filter)
-                table.insert(M.windows, win)
-            end)
-        end)))
-    end
-    return tasks
-end
-
 function M.close()
     local tasks = {}
     for _, win in pairs(M.windows) do
@@ -129,7 +101,7 @@ function M.close()
         end)
     )
     end
-    return tasks
+    async.util.gather(tasks)
 end
 
 function M.open()
@@ -142,7 +114,7 @@ function M.open()
         end)
     )
     end
-    return tasks
+    async.run(async.util.join(table.unpack(tasks)))
 end
 
 

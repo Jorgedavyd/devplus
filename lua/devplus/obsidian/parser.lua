@@ -1,5 +1,4 @@
 local todo_template = require("template").todo
-local motes = require("taskMotes")
 
 ---@class ObsidianParser
 ---@field singleTaskParser function
@@ -7,14 +6,6 @@ local motes = require("taskMotes")
 ---@field task function
 ---@field singleBlockParser function
 local M = {}
-
----@param due_date string
----@param priority string
----@param description string
----@return string
-function M.singleTaskParser(due_date, priority, description)
-    return ("- [ ] %s %s%s %s%s"):format(description, motes.due_date, due_date, motes.priority[priority] ,priority)
-end
 
 ---@param s string
 ---@param match string

@@ -22,7 +22,7 @@ end
 ---@param lines table<number, string>
 ---@param buf number
 ---@return nil
-function M.create(lines, buf)
+function M.create(lines, buf, filter)
     api.nvim_buf_set_lines(buf, 0, -1, false, lines)
 end
 

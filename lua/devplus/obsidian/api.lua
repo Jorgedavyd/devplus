@@ -4,7 +4,8 @@ local config = require("devplus.setup").config
 local M = {}
 
 function M.showObsidianTasks()
-    --- setup watch dog
+    ---make the query to the obsdian thing
+    ---
 end
 
 return M

@@ -7,18 +7,23 @@ local M = {}
 M.database = nil
 
 function M.init()
-    M.database = sqlite3.open(vim.fn.stdpath('data') .. '/devplus.db')
-    M.categories.init()
-    M.sources.init()
-    M.priority.init()
-    M.language.init()
-    M.projects.init()
-    M.breaks.init()
-    M.files.init()
-    M.buffer_records.init()
-    M.tasks.init()
-    M.editing_time.init()
-    M.ptr_records.init()
+    local db_path = vim.fn.stdpath('data') .. '/devplus.db'
+    local ok, err = pcall(function()
+        M.database = sqlite3.open(db_path)
+        M.database:exec[[PRAGMA foreign_keys = ON;]]
+        for _, module in pairs({M.categories, M.sources, M.priority, M.language,
+                                M.projects, M.breaks, M.files, M.buffer_records,
+                                M.tasks, M.editing_time, M.ptr_records}) do
+            module.init()
+        end
+    end)
+
+    if not ok then
+        vim.notify("Failed to initialize database: " .. tostring(err), vim.log.levels.ERROR)
+        return false
+    end
+
+    return true
 end
 
 M.categories = {

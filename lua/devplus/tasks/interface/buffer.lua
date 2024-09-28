@@ -12,29 +12,23 @@ local M = {}
 ---@type number|nil
 M.buf = nil
 
-function M.create()
+function M.create(buf, filter)
     for name, _ in pairs(config.categories) do
         local lines = find.grep(name)
-        find.create(lines, M.buf)
+        find.create(lines, buf, filter)
     end
 end
 
 ---@param name string
 ---@return number
 function M.init(name)
-    M.buf = api.nvim_create_buf(false, true)
-    api.nvim_buf_set_name(M.buf, name)
-    api.nvim_buf_set_option(M.buf, 'modifiable', false)
-    api.nvim_buf_set_option(M.buf, 'buftype', 'nofile')
-    retu
-    M.create()
-    prettier.init(M.buf)
-    config.keymaps()
-end
-
----@param tasks table<number, Task>
-function M.update(tasks)
-    local buf_tasks = M.treat(tasks)
+    local buf = api.nvim_create_buf(false, true)
+    api.nvim_buf_set_name(buf, name)
+    api.nvim_buf_set_option(buf, 'modifiable', false)
+    api.nvim_buf_set_option(buf, 'buftype', 'nofile')
+    M.create(buf)
+    prettier.init(buf)
+    config.keymaps(buf)
 end
 
 ---@private
@@ -49,9 +43,15 @@ function M.treat(tasks)
 end
 --- API
 
-function M.reset()
-    api.nvim_buf_delete(M.buf)
-    M.init()
+---@param lines table<number, string>
+function M.append(buf, lines)
+    api.nvim_buf_set_lines(buf, -1, -1, false, lines)
+end
+
+
+function M.reset(buf_name, bufnr)
+    api.nvim_buf_delete(bufnr)
+    M.init(buf_name)
 end
 
 return M
