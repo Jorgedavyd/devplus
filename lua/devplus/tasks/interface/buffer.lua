@@ -28,7 +28,8 @@ function M.init(name)
     api.nvim_buf_set_option(buf, 'buftype', 'nofile')
     M.create(buf)
     prettier.init(buf)
-    config.keymaps(buf)
+    config.buffer_keymaps(buf)
+    return buf
 end
 
 ---@private

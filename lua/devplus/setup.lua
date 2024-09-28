@@ -1,73 +1,73 @@
 local api = require('devplus.tracker.api')
 local database = require("devplus.database")
 ---@class Setup
----@field windows table<string|number, function>
----@field buffer table<number, ...>
----@field prettier table<string, string>
----@field keymaps function
+---@field default table
+---@field forward function
 local M = {}
 
 M.default = {
     keymaps = function ()
     end,
+    ---@param buf number
+    ---@return nil
+    buffer_keymaps = function (buf)
+    end,
     obsidian = {
         vault = "",
-        project = "",
+        project = "projects/",
     },
     tasks= {
         windows = {
             filters = {
                 {
                     function (task)
-                        return (task.priority == 'high') and (task.due_date < os.time(os.date("*t")) + )
+                        return (task.priority == 'high') and (task.due_date < os.time() + 3600*24*3) -- 3 days
                     end,
                     function (task)
-                        return (task.priority == 'high') and (task.due_date > os.date() + os.time(day = 5))
+                        return (task.priority == 'high') and (task.due_date > os.time() + 3600*24*3)
                     end,
                 },
                 {
                     function (task)
-                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date < os.date() + os.time(day = 5))
+                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date < os.time() + 3600*24*3)
                     end,
                     function (task)
-                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date > os.date() + os.time(day = 5))
+                        return (task.priority == 'low' or task.priority == 'medium') and (task.due_date > os.time() + 3600*24*3)
                     end,
                 }
             },
             config = {
-                relative = 'editor',
                 style = 'minimal',
                 border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
             }
         },
         categories = {
-            TODO = "" ---shoutout to folke for these icons
+            TODO = " ",
+            DATA = "",
+            TRAIN = ""
         },
         time_format = "%y%m%d",
-        ptr_virtual_text= "->"
+        ptr_virtual_text = "->"
     },
     tracker = {
+        interval = 1800, --- Database ingestion every one hour
         sql_functions = {
-
         },
         visualization = {
-            api.tracker.visualization.bar(x = [[]], y = [[]])
+            api.tracker.visualization.bar(),
         }
     },
     llm = {
         type = "", --- Look at supported models (if there's not one of yours, you can implement it yourself)
-        token = "" --- include your token, be careful!!
+        token = "" --- include your API token, be careful!!
     }
 }
 
----@type table<string, function|string|table>
-M.config = nil
 
 function M.forward(opts)
+    ---@type table<string, function|string|table>
     M.config = vim.tbl_deep_extend('force', opts, M.default)
     database.forward(opts.tracker)
-    tasks.forward(opts.tasks)
-    tracker.forward(opts.tracker)
 end
 
 return M

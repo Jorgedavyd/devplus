@@ -1,8 +1,6 @@
-local todo_template = require("template").todo
+local template = require("devplus.obsidian.template")
 
 ---@class ObsidianParser
----@field singleTaskParser function
----@field assert function
 ---@field task function
 ---@field singleBlockParser function
 local M = {}
@@ -10,25 +8,24 @@ local M = {}
 ---@param s string
 ---@param match string
 ---@param value ?string
-function string.replace(s,match,value)
+function string.replace(s, match, value)
     value = value or ""
     local i, j = string.find(s, match)
     if i and j then
-         return string.sub(s, 0, i) .. value .. string.sub(s, j)
+        return string.sub(s, 1, i - 1) .. value .. string.sub(s, j + 1)
     else
-        return
+        return s
     end
-
 end
 
----@param task table <string, string>
----@return table <string, string>
+---@param task table<string, string>
+---@return table<string, string>
 function M.singleBlockParser(task)
     local block = {}
-    for _, line in ipairs(todo_template) do
-        local group = string.match(line, "{{(.+?)}}")
+    for _, line in ipairs(template.todo) do
+        local group = string.match(line, "{{(.-)}}")
         if group then
-            string.replace(line, task[todo_template[group[0]]])
+            line = string.replace(line, "{{" .. group .. "}}", task[template.todo_default[group]])
         end
         table.insert(block, line)
     end

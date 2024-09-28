@@ -8,7 +8,7 @@ local M = {}
 ---@param task Task
 ---@return string
 function M.obsidian(task)
-    return ("- [ ] %s %s%s %s%s"):format(task.description, icons.due_date, task.due_date, icons.priority[task.priority] ,task.priority)
+    return ("- [ ] %s %s%s %s%s %s"):format(task.category, icons.due_date, task.due_date, icons.priority[task.priority] ,task.priority, task.description)
 end
 
 ---@param task Task
