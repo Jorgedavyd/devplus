@@ -22,7 +22,8 @@ function M.scan(buf, start_line, end_line)
                 })
                 table.insert(tasks, {
                     task = encoder.inline(string.sub(line, start, -1)),
-                    line = start_line + i
+                    line = start_line + i,
+                    path = vim.fn.expand("%")
                 })
             end
         end

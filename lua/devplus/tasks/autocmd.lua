@@ -1,5 +1,5 @@
 local interface = require("devplus.tasks.interface")
-local task_tracking = require("devplus.tasks.buffer")
+local task_tracking = require("devplus.tasks.task.buffer")
 local encoder = require("devplus.tasks.task.encoder")
 local task = require("devplus.tasks.task")
 local api = vim.api

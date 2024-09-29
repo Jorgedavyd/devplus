@@ -45,8 +45,10 @@ local function setLines(out, buf, filter)
             })
             api.nvim_buf_set_extmark(buf, M.namespace, -1, 0, {
                 hl_group = "Normal",
-                virt_text = {{"→ Task", "Statement"}},
+                hl_eol = true,
+                virt_text = {{" ", "Normal"}},
                 virt_text_pos = "overlay",
+                virt_text_win_col = 0
             })
         end
     end
@@ -103,14 +105,19 @@ end
 
 ---@param buf number
 ---@param line string
-function M.append(buf, line)
-    api.nvim_buf_set_lines(buf, -1, -1, false, {line})
-    api.nvim_buf_set_extmark(buf, M.namespace, -1, 0, { -- setup for correct usage
+function M.append(buf, data, line, path)
+    api.nvim_buf_set_lines(buf, -1, -1, false, {data})
+    api.nvim_buf_set_extmark(buf, M.namespace, -1, 0, {
         hl_group = "Normal",
         hl_eol = true,
         virt_text = {{" ", "Normal"}},
         virt_text_pos = "overlay",
         virt_text_win_col = 0
+    })
+    M.paths[buf] = M.paths[buf] or {}
+    table.insert(M.paths[buf], {
+        line = line,
+        path = path
     })
 end
 

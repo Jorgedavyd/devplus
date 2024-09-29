@@ -49,12 +49,12 @@ function M.toggle_interface()
     end
 end
 
----@param tasks table<number, Task>
-function M.update_buffer(tasks)
+---@param scanned_tasks table
+function M.update_buffer(scanned_tasks)
     for _, opts in ipairs(M.window_config) do
-        for _, task in pairs(tasks) do
-            if opts.filter(task) then
-                buffer.append(opts.buf, decoder.buffer(task))
+        for _, raw_task in pairs(scanned_tasks) do
+            if opts.filter(raw_task) then
+                buffer.append(opts.buf, decoder.buffer(raw_task.task), raw_task.line, raw_task.path)
             end
         end
     end
