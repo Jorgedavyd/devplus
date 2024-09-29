@@ -11,6 +11,13 @@ M.default = {
     ---@param buf number
     ---@return nil
     buffer_keymaps = function (buf)
+        api.nvim_buf_set_keymap(buf, "n", "<CR>", "", {
+            noremap = true,
+            callback = function()
+                M.jump_to_task(buf)
+            end,
+            desc = "Jump to task file"
+        })
     end,
     obsidian = {
         vault = "",

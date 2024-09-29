@@ -54,7 +54,7 @@ end
 
 function M.create_plots(filters, opts)
     for name, filter in pairs(filters) do
-        vim.fn.SeabornPlot(opts.width, opts.height, name)
+        vim.fn.SeabornPlot(opts.width, opts.height, name, filter)
     end
 end
 

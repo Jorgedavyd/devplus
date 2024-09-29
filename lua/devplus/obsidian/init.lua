@@ -28,7 +28,7 @@ end
 function M.send (task)
     local project_path = resolveProject()
     if not project_path then
-        logs.error("Couldn't find project base directory, project must be a git repository")
+        log.error("Couldn't find project base directory, project must be a git repository")
     end
     local target = vim.fn.resolve(config.vault .. "/" .. config.project .. "/" .. project_path .. "/todo.md")
     local block = parser.singleBlockParser(task)

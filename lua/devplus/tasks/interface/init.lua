@@ -1,65 +1,62 @@
 local config = require("devplus.setup").config.tasks
 local windows = require("devplus.tasks.interface.windows")
 local buffer = require("devplus.tasks.interface.buffer")
-local async = require("plenary.async").async
-local await = require("plenary.async").await
-local filter = require("devplus.tasks.interface.filter")
-local prettier = require("devplus.tasks.interface.front")
+local decoder = require("devplus.tasks.task.decoder")
+local ptr = require("devplus.tasks.interface.ptr")
 
 local api = vim.api
 
+---@class Interface
+---@field toggle_interface function
+---@field update_buffer function
 local M = {}
 
----@type table<number, table<string, number>>
-M.interface = {}
-
+---@private
+---@param iterables table
+---@return table
 local function chain_from_iterable(iterables)
-    local co = coroutine.create(function()
-        for _, iterable in ipairs(iterables) do
-            for _, value in ipairs(iterable) do
-                coroutine.yield(value)
-            end
+    local result = {}
+    for _, iterable in ipairs(iterables) do
+        for _, value in ipairs(iterable) do
+            table.insert(result, value)
         end
-    end)
-
-    return function()
-        local status, value = coroutine.resume(co)
-        if status then return value else return nil end
     end
+    return result
 end
 
----@return nil
-function M.init()
-    windows.assert(config.windows)
-    local configs = windows.getWindowsConfig(config.windows.filters)
-    if type(configs[0]) == "table" then
-        configs = chain_from_iterable(configs)
-    end
-    local tasks = {}
-    for _, config in configs do
-        table.insert(tasks, async(function ()
-            await(vim.schedule_wrap(function ()
-                local buf = buffer.create()
-                local win = api.nvim_open_win(buf, true, config)
-                api.nvim_win_set_buf(win, buf)
-                local filtered = filter.create(buf, config.filter)
-                buffer.append(buf, filtered)
-                table.insert(M.interface, {
-                    win = win,
-                    buf = buf
-                })
-            end)
-        end)))
+windows.assert()
+M.window_config = windows.getWindowsConfig(config.windows.filters)
+if type(M.window_config[0]) == "table" then
+    M.window_config = chain_from_iterable(M.window_config)
+end
+
+M.buffers = {}
+for _, opt in pairs(M.window_config) do
+    local buf = buffer.init(opt.filter)
+    table.insert(M.buffers, buf)
+end
+
+M.windows = {}
+
+function M.toggle_interface()
+    for idx, buf in ipairs(M.buffers) do
+        if M.windows[idx] and api.nvim_win_is_valid(M.windows[idx]) then
+            api.nvim_win_close(M.windows[idx], true)
+            M.windows[idx] = nil
+        else
+            local win = api.nvim_open_win(buf, true, M.window_config[idx])
+            api.nvim_win_set_buf(win, buf)
+            M.windows[idx] = win
+        end
     end
 end
 
 ---@param tasks table<number, Task>
-function M.update(tasks, filters)
-    for idx, opts in ipairs(M.interface) do
+function M.update_buffer(tasks)
+    for _, opts in ipairs(M.window_config) do
         for _, task in pairs(tasks) do
-            if filters[idx](task) then
-                buffer.append(opts.buf, task)
-                prettier.scan(opts.buf)
+            if opts.filter(task) then
+                buffer.append(opts.buf, decoder.buffer(task))
             end
         end
     end

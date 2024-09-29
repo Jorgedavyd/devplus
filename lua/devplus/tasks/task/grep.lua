@@ -19,4 +19,15 @@ function M.change(line, buf)
 end
 
 
+---@param lines table<number, string>
+---@param buf number
+---@return nil
+function M.create(lines, buf, filter)
+    for _, line in pairs(lines) do
+        if filter(line) then
+            api.nvim_buf_set_lines(buf, -1, -1, false, {line})
+        end
+    end
+end
+
 return M

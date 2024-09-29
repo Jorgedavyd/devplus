@@ -1,9 +1,6 @@
-local setup = require("devplus.setup")
-local async = require("plenary.async").async
-local await = require("plenary.async").await
+local config = require("devplus.setup").config
 local filter = require("devplus.tasks.interface.filter")
 local logs = require("devplus.logs")
-local api = vim.api
 
 ---@alias Config table<number, Filter> | table<number, table<number, Filter>>
 ---@alias WinMatrix table<number, string|number|Filter> | table<number, table<number, number|string|Filter>>
@@ -13,14 +10,14 @@ local api = vim.api
 local M = {}
 
 ---@private
----@param config Config | Filter
+---@param opts Config
 ---@return nil
-function M.filter_assert(config)
-    for idx, ops in ipairs(config) do
+function M.filter_assert(opts)
+    for idx, ops in ipairs(opts) do
         if type(ops) == 'table' then
             M.filter_assert(ops)
         elseif type(ops) == 'function' then
-            if !filter.isFilterFunction(config) then
+            if !filter.isFilterFunction(ops) then
                 logs.error("Not valid function at function" .. idx .. " in windows opts, expected a function(task) -> boolean")
             end
         end
@@ -28,27 +25,20 @@ function M.filter_assert(config)
 end
 
 ---@private
----@param config table<string, string>
+---@param opts table<string, string>
 ---@return nil
-function M.config_assert(config)
-    for name, _ in pairs(config) do
+function M.config_assert(opts)
+    for name, _ in pairs(opts) do
         local flag
-        for _, value in {'relative', 'style', 'border'} do
+        for _, value in {'style', 'border'} do
             if name == value then
                 flag = 1
             end
         end
-        if !flag then
+        if not flag then
             logs.error("Not valid argument %s for config, expected relative, style, border")
         end
     end
-end
-
----@param config table<string, Config | table<string, string>>
----@return nil
-function M.assert(config)
-    M.filter_assert(config.filters)
-    M.config_assert(config.config)
 end
 
 ---@private
@@ -62,6 +52,13 @@ function M.matrixAssert(opts)
             end
         end
     end
+end
+
+---@return nil
+function M.assert()
+    M.filter_assert(config.windows.filters)
+    M.config_assert(config.windows.config)
+    M.matrixAssert(config.windows.filters)
 end
 
 function M.getWindowsConfig(filters, row_size, row, col_size, col)
@@ -79,43 +76,14 @@ function M.getWindowsConfig(filters, row_size, row, col_size, col)
     elseif type(filters) == "function" then
         local height, width = vim.o.lines, math.floor(vim.o.columns * 5 / 8)
         local shift = vim.o.columns - width
-        return vim.tbl_deep_extend('force', {
+        return vim.tbl_extend('force', {
             width = math.floor(height / row_size),
             height = math.floor(width / col_size),
             row = row,
             col = shift + col,
             filter = filters
-        }, setup.windows.config)
+        }, config.window.config)
     end
 end
-
-M.windows = {}
-
-function M.close()
-    local tasks = {}
-    for _, win in pairs(M.windows) do
-        table.insert(tasks, async(function()
-            await(vim.schedule_wrap(function ()
-                api.nvim_win_close(win)
-            end))
-        end)
-    )
-    end
-    async.util.gather(tasks)
-end
-
-function M.open()
-    local tasks = {}
-    for _, win in pairs(M.windows) do
-        table.insert(tasks, async(function()
-            await(vim.schedule_wrap(function ()
-                api.nvim_win_open(win)
-            end))
-        end)
-    )
-    end
-    async.run(async.util.join(table.unpack(tasks)))
-end
-
 
 return M
