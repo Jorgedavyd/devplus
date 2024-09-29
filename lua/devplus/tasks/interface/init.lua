@@ -2,8 +2,6 @@ local config = require("devplus.setup").config.tasks
 local windows = require("devplus.tasks.interface.windows")
 local buffer = require("devplus.tasks.interface.buffer")
 local decoder = require("devplus.tasks.task.decoder")
-local ptr = require("devplus.tasks.interface.ptr")
-
 local api = vim.api
 
 ---@class Interface

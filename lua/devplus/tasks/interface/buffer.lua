@@ -2,7 +2,6 @@ local decoder = require("devplus.tasks.task.decoder")
 local encoder = require("devplus.tasks.task.encoder")
 local config = require("devplus.setup").config.tasks
 local find = require("devplus.tasks.grep")
-local ptr = require("devplus.tasks.interface.ptr")
 local log = require("devplus.logs")
 local api = vim.api
 
@@ -14,12 +13,23 @@ local M = {}
 ---@type number|nil
 M.buf = nil
 
+M.namespace = api.nvim_create_namespace("devplus-interact")
+
 ---@type table
 M.paths = {}
 
+---@param buf number
+function M.jump_to_task(buf)
+    local line = api.nvim_win_get_cursor(0)[1] - 1
+    local tab = M.paths[buf][line]
+    if tab.path and tab.line then
+        api.nvim_command("e +" .. tab.line .. " " .. tab.path)
+    end
+end
 
 ---@private
----@param lines table<number, string>
+---@param filter Filter
+---@param out table
 ---@param buf number
 ---@return nil
 local function setLines(out, buf, filter)
@@ -28,10 +38,12 @@ local function setLines(out, buf, filter)
             api.nvim_buf_set_lines(buf, -1, -1, false, {decoder.buffer(iter.task)})
             local line = iter.line
             local path = iter.path
-            --- revisar, extmark prhobido
             M.paths[buf] = M.paths[buf] or {}
-            table.insert(M.paths[buf], path)
-            api.nvim_buf_set_extmark(buf, ptr.namespace, -1, 0, {
+            table.insert(M.paths[buf], {
+                line = line,
+                path = path
+            })
+            api.nvim_buf_set_extmark(buf, M.namespace, -1, 0, {
                 hl_group = "Normal",
                 virt_text = {{"→ Task", "Statement"}},
                 virt_text_pos = "overlay",
@@ -91,9 +103,9 @@ end
 
 ---@param buf number
 ---@param line string
-function M.append(buf, line, file)
+function M.append(buf, line)
     api.nvim_buf_set_lines(buf, -1, -1, false, {line})
-    api.nvim_buf_set_extmark(buf, ptr.namespace, -1, 0, {
+    api.nvim_buf_set_extmark(buf, M.namespace, -1, 0, { -- setup for correct usage
         hl_group = "Normal",
         hl_eol = true,
         virt_text = {{" ", "Normal"}},

@@ -1,5 +1,6 @@
 local api = require('devplus.tracker.api')
 local database = require("devplus.database")
+local ptr = require("devplus.tasks.interface.ptr")
 ---@class Setup
 ---@field default table
 ---@field forward function
@@ -14,7 +15,7 @@ M.default = {
         api.nvim_buf_set_keymap(buf, "n", "<CR>", "", {
             noremap = true,
             callback = function()
-                M.jump_to_task(buf)
+                ptr.jump_to_task(buf)
             end,
             desc = "Jump to task file"
         })
