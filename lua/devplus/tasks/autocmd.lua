@@ -15,20 +15,16 @@ api.nvim_create_autocmd(
         desc = "Devplus: Update buffer on task creation.",
         callback = function ()
             local tasks = task_tracking.get_new()
-            local temp = {}
 
-            for _, task_ in ipairs(tasks) do
-                table.insert(temp, encoder.inline(task_))
-            end
-
-            for idx, i in ipairs(temp) do
+            for idx, i in ipairs(tasks) do
                 for _, j in ipairs(task.cache) do
                     if i == j then
-                        table.remove(temp, idx)
+                        table.remove(tasks, idx)
                     end
                 end
             end
-            interface.update_buffer(temp)
+
+            interface.update_buffer(tasks)
         end
     }
 )

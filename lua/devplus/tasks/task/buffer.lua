@@ -1,5 +1,4 @@
 local categories = require("devplus.setup").config.tasks.categories
-local buffer = require("devplus.tasks.interface.buffer")
 local encoder = require("devplus.tasks.task.encoder")
 local api = vim.api
 local M = {}
@@ -21,17 +20,12 @@ function M.scan(buf, start_line, end_line)
                     virt_text = {{category}},
                     virt_text_pos = 'right-align'
                 })
-                table.insert(tasks, string.sub(line, start, -1))
+                table.insert(tasks, {
+                    task = encoder.inline(string.sub(line, start, -1)),
+                    line = start_line + i
+                })
             end
         end
-    end
-    return tasks
-end
-
-function M.treat(raw)
-    local tasks = {}
-    for _, task in ipairs(raw) do
-        table.insert(tasks, encoder.inline(task))
     end
     return tasks
 end
@@ -41,9 +35,7 @@ function M.get_new()
     local changes = vim.fn.getchangelist(bufnr)[1]
     if #changes > 0 then
         local last_change = changes[#changes]
-        local raw_tasks = M.scan(buffer.buf, last_change[1] - 1, last_change[1] - 1)
-        local tasks = M.treat(raw_tasks)
-        vim.list_extend('force', M.history, tasks) -- cuidado
+        local tasks = M.scan(bufnr, last_change[1] - 1, last_change[1] - 1)
         return tasks
     end
 end

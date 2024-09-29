@@ -5,17 +5,6 @@ M.namespace = api.nvim_create_namespace("devplus-pointer")
 
 M.flag = false
 
----@param buf number
-function M.jump_to_task(buf)
-    local line = api.nvim_win_get_cursor(0)[1] - 1
-    local path = M.paths[buf] and M.paths[buf][line]
-    if path then
-        api.nvim_command("e " .. path)
-    else
-        print("No task associated with this line")
-    end
-end
-
 ---@param buffers table
 ---@param task_index number
 ---@param buf_index number
