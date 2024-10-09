@@ -23,6 +23,7 @@ end
 
 ---@return nil
 function M.tasks.toggle_checkmark()
+
 end
 
 return M
