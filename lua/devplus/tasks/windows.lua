@@ -1,13 +1,16 @@
 local config = require("devplus.setup").config
-local filter = require("devplus.tasks.interface.filter")
+local filters = require("devplus.setup").config.filters
 local logs = require("devplus.logs")
-
----@alias Config table<number, Filter> | table<number, table<number, Filter>>
----@alias WinMatrix table<number, string|number|Filter> | table<number, table<number, number|string|Filter>>
+local utils = require("devplus.tasks.utils")
 ---@class Windows
 ---@field config Config
 ---@field setWindows function
+---@field windows table<number, number>
 local M = {}
+
+M.windows = {}
+
+M.configs = M.getWindowsConfig(filters)
 
 ---@private
 ---@param opts Config
@@ -17,7 +20,7 @@ function M.filter_assert(opts)
         if type(ops) == 'table' then
             M.filter_assert(ops)
         elseif type(ops) == 'function' then
-            if !filter.isFilterFunction(ops) then
+            if !utils.isFilterFunction(ops) then
                 logs.error("Not valid function at function" .. idx .. " in windows opts, expected a function(task) -> boolean")
             end
         end
@@ -81,7 +84,6 @@ function M.getWindowsConfig(filters, row_size, row, col_size, col)
             height = math.floor(width / col_size),
             row = row,
             col = shift + col,
-            filter = filters
         }, config.window.config)
     end
 end

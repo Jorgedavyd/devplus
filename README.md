@@ -21,6 +21,10 @@ The **devplus** plugin consists on:
 ```lua
 return {
     'Jorgedavyd/devplus',
+    dependencies = {
+        'sql',
+        'treesitter', # TODO poner esto bien
+    },
     config = ,
 }
 ```

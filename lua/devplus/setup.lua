@@ -6,6 +6,8 @@ local ptr = require("devplus.tasks.interface.ptr")
 ---@field forward function
 local M = {}
 
+M.config = {}
+
 M.default = {
     keymaps = function ()
     end,
@@ -50,9 +52,15 @@ M.default = {
             }
         },
         categories = {
-            TODO = " ",
-            DATA = "",
-            TRAIN = ""
+            TODO = {
+                icon =  " ",
+            },
+            DATA = {
+                icon = "",
+            },
+            TRAIN = {
+                icon = "",
+            }
         },
         time_format = "%y%m%d",
         ptr_virtual_text = "->"

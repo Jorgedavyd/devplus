@@ -1,25 +1,41 @@
----database ingestion for all triggers that were counted
+local api = vim.api
+--- database ingestion for all triggers that were counted
 
-M.categories = {
+local id = api.nvim_create_augroup("devplus-tracker")
 
-M.tasks = {
+---@class BufferTracker
+---@field status table
+local M = {}
 
-M.sources = {
+M.status = {}
 
-M.priority = {
+--- Buffer wise: Tracks the number of lines added and deleted,
+--- the time that you were at the buffer.
 
-M.files = {
+--- ON DEATACH
+function M.getAddedLines()
+end
 
-M.language = {
+function M.getDeletedLines()
+end
 
-M.projects = {
+function M.getTime()
+end
 
-M.ptr_records = {
+--- ON ATTACH
 
-M.buffer_records = {
+api.nvim_create_autocmd(
+    {"BufWinEnter"},
+    {
+        group = id,
+    }
+)
 
-M.editing_time = {
-
-M.breaks = { --- Non ptr intervals
+api.nvim_create_autocmd(
+    {"BufWinLeave"},
+    {
+        group = id,
+    }
+)
 
 return M

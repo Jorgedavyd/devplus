@@ -1,29 +1,50 @@
-local interface = require("devplus.tasks.interface")
-local task_tracking = require("devplus.tasks.task.buffer")
-local task = require("devplus.tasks.task")
 local api = vim.api
 
 local M = {}
 
-M.id = api.nvim_create_augroup("devplus-task-buffer", {clear = false})
+M.buffer_id = api.nvim_create_augroup("devplus-tasks", {clear = false})
 
+---This one will look through all files to find the TODOs,
+---it will be non-blocking to avoid overhead at startup.
 api.nvim_create_autocmd(
-    {"TextChanged"},
+    {"VimEnter"},
     {
-        group = M.id,
-        desc = "Devplus: Update buffer on task creation.",
+        group = M.buffer_id,
         callback = function ()
-            local tasks = task_tracking.get_new()
-
-            for idx, i in ipairs(tasks) do
-                for _, j in ipairs(task.cache) do
-                    if i == j then
-                        table.remove(tasks, idx)
-                    end
-                end
-            end
-
-            interface.update_buffer(tasks)
-        end
+            ---Look through all the files in the project
+            ---create the buffers and the windows
+            ---create the tasks
+            ---add the tasks to the buffers
+        end,
     }
 )
+
+---This one will check if the current buffer has new tasks.
+api.nvim_create_autocmd(
+    {"BufWrite"},
+    {
+        group = M.buffer_id,
+        callback = function ()
+            ---Look through the file with treesitter query
+            ---Create the new tasks and add to the cache
+            ---run the update into the buffer to get the
+            ---new tasks from the buffer
+            ---add to the SQL query queue
+        end,
+    }
+)
+
+---This one will check if the current buffer has new tasks.
+api.nvim_create_autocmd(
+    {"VimLeave"},
+    {
+        group = M.buffer_id,
+        callback = function ()
+            --- Delete all the tasks that've been done
+            --- Deactivates all the tasks that've been running
+            --- ingest the tasks status to SQL.
+        end,
+    }
+)
+
+return M

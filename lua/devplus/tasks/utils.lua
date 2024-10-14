@@ -1,7 +1,16 @@
----@alias Filter fun(value: string): boolean
----@class FiltUtils
----@field isFilter function
 local M = {}
+---@private
+---@param iterables table
+---@return table
+function M.chain_from_iterable(iterables)
+    local result = {}
+    for _, iterable in ipairs(iterables) do
+        for _, value in ipairs(iterable) do
+            table.insert(result, value)
+        end
+    end
+    return result
+end
 
 ---@param func function
 ---@return boolean
