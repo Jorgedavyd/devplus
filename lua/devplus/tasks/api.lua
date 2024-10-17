@@ -4,33 +4,40 @@ local api = vim.api
 local M = {}
 
 function M.toggle_interface()
-    local bufnr = api.nvim_get_current_buf()
-    local found_buf = false
+    local current_buf = api.nvim_get_current_buf()
+    local is_interface_open = false
 
     for _, buf in ipairs(M.buffers) do
-        if buf == bufnr then
-            found_buf = true
+        if buf == current_buf then
+            is_interface_open = true
             break
         end
     end
 
     vim.defer_fn(function()
-        assert(#buffers == #config, "Not valid config")
-
-        if found_buf then
-            for idx, _ in ipairs(M.buffers) do
-                vim.defer_fn(function()
-                    api.nvim_open_win(M.buffers[idx], false, config[idx])
-                end, 10)
+        if not is_interface_open then
+            for idx, buf in ipairs(M.buffers) do
+                api.nvim_open_win(buf, idx == 1, M.config[idx])
             end
         else
-            for idx, _ in ipairs(M.buffers) do
-                vim.defer_fn(function()
-                    api.nvim_win_close(api.nvim_get_current_win(), false)
-                end, 10)
+            local wins = api.nvim_list_wins()
+            for _, win in ipairs(wins) do
+                local win_buf = api.nvim_win_get_buf(win)
+                for _, buf in ipairs(M.buffers) do
+                    if win_buf == buf then
+                        api.nvim_win_close(win, false)
+                        break
+                    end
+                end
             end
         end
     end, 0)
+end
+
+function M.setup()
+    assert(#buffers == #config, "Buffer and configuration counts must match")
+    M.buffers = buffers
+    M.config = config
 end
 
 ---@return nil
