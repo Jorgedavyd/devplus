@@ -1,6 +1,7 @@
 local api = vim.api
 local config = require("devplus.setup").config.tasks
-local cache = require("devplus.tasks.cache")
+local ingest = require("devplus.database.ingestion")
+local queue = require("devplus.database.queue")
 
 ---@class Ptr
 ---@field toggle function
@@ -91,8 +92,7 @@ function M.deactivate()
     if M.state.line and M.state.bufnr and M.state.clock_extmark_id and M.state.arrow_extmark_id then
         pcall(vim.api.nvim_buf_del_extmark, M.state.bufnr, M.namespace, M.state.arrow_extmark_id)
         pcall(vim.api.nvim_buf_del_extmark, M.state.bufnr, M.namespace, M.state.clock_extmark_id)
-        sql.exec[[]]
-        ---SQL ingestion
+        queue.append(ingest.task_ptr_time) --revisar
         M.state = {line = nil, bufnr = nil, arrow_extmark_id = nil, clock_extmark_id = nil}
     end
 end
