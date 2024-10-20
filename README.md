@@ -28,10 +28,9 @@ return {
     },
     lazy = 1000,
     keymaps = function(_, map)
-        local ptr = require("devplus.tasks.ptr")
-        local checkmark = require("devplus.tasks.ptr")
-        map('n', '-', ptr.toggle())
-        map('n', '+', ptr.checkmark())
+        local api = require("devplus.api")
+        map('n', '-', api.toggle_ptr())
+        map('n', '+', api.toggle_checkmark())
     end
 }
 ```
