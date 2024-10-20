@@ -1,15 +1,7 @@
-local previewers = require("telescope.previewers")
-local pickers = require('telescope.pickers')
-local finders = require('telescope.finders')
-local conf = require('telescope.config').values
-local actions = require('telescope.actions')
-local action_state = require('telescope.actions.state')
-local themes = require('telescope.themes')
 local utils = require("devplus.tasks.utils")
 local decoder = require("devplus.tasks.decoder")
 local config = require("devplus.setup").config
 local log = require("devplus.logs")
-local cache = require("depvlus.tasks.cache")
 
 ---@alias Filter fun(task: Task): boolean
 ---@alias Opts {[string]: number}
@@ -106,63 +98,6 @@ function M.toggle()
             end
         end
     end, 0)
-end
-
-M.previewer = previewers.new_buffer_previewer({
-    title = "Task Preview",
-    define_preview = function(self, entry)
-        local task = entry.value
-        if task.file and task.line then
-            local lines = vim.fn.readfile(task.file)
-            vim.api.nvim_buf_set_lines(self.state.bufnr, 0, -1, false, lines)
-            local ft = vim.filetype.match({ filename = task.file })
-            if ft then
-                vim.api.nvim_buf_set_option(self.state.bufnr, 'filetype', ft)
-            end
-            vim.api.nvim_win_set_cursor(self.state.winid, { task.line, task.col or 0 })
-            vim.api.nvim_buf_add_highlight(self.state.bufnr, -1, 'TelescopePreviewLine', task.line - 1, 0, -1)
-        end
-    end
-})
-
-function M.create_task_picker()
-    local tasks = cache.history
-    local picker_opts = themes.get_dropdown({
-        layout_config = {
-            height = 0.8,
-            preview_height = 0.6,
-        },
-        layout_strategy = "vertical",
-        sorting_strategy = "ascending",
-        border = true,
-        preview_title = "Task Preview",
-    })
-    pickers.new(picker_opts, {
-        prompt_title = "Tasks",
-        finder = finders.new_table({
-            results = tasks,
-            entry_maker = function(task)
-                return {
-                    value = task,
-                    display = string.format("[%s] %s - %s", task.priority, task.id, task.description),
-                    ordinal = task.description,
-                }
-            end,
-        }),
-        sorter = conf.generic_sorter(picker_opts),
-        previewer = M.previewer,
-        attach_mappings = function(prompt_bufnr, map)
-            actions.select_default:replace(function()
-                local selection = action_state.get_selected_entry()
-                actions.close(prompt_bufnr)
-                if selection then
-                    local task = selection.value
-                    vim.cmd(string.format('edit +%d %s', task.line, task.file))
-                end
-            end)
-            return true
-        end,
-    }):find()
 end
 
 return M

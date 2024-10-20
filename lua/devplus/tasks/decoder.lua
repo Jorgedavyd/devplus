@@ -22,8 +22,8 @@ function M.inline(task)
 end
 
 ---@param task Task
-function M.buffer(task)
-    return ("%s %s %s"):format(categories[task.category], task.due_date, task.description)
+function M.telescope(task)
+    return ("%s %s %s"):format(categories[task.category].icon, task.due_date, task.description)
 end
 
 return M

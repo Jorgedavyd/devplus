@@ -3,7 +3,8 @@
 ---@field category number|nil
 ---@field priority number|nil
 ---@field description string|nil
----@field file string|nil
+---@field filepath string|nil
+---@field line number|nil
 ---@field opts TaskOpts
 local M = {}
 

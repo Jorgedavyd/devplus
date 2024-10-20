@@ -13,7 +13,7 @@ The goal of **devplus** is to provide a non-blocking framework towards developer
 
 # Summary
 The **devplus** plugin consists on:
-1. Versatile task management for a variety of **triggers**.
+1. Versatile task management for a variety of frameworks.
 2. Constant tracking of buffer timings, task completion, lines of code created, among others.
 3. Synchronization with [Obsidian](https://obsidian.md/) **GET** and **POST** for Tasks.
 
@@ -22,10 +22,17 @@ The **devplus** plugin consists on:
 return {
     'Jorgedavyd/devplus',
     dependencies = {
-        'sql',
-        'treesitter', # TODO poner esto bien
+        'sql', -- take a look
+        'nvim-treesitter/treesitter.nvim',
+        'nvim-telescope/telescope.nvim'
     },
-    config = ,
+    lazy = 1000,
+    keymaps = function(_, map)
+        local ptr = require("devplus.tasks.ptr")
+        local checkmark = require("devplus.tasks.ptr")
+        map('n', '-', ptr.toggle())
+        map('n', '+', ptr.checkmark())
+    end
 }
 ```
 

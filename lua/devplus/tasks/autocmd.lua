@@ -14,7 +14,7 @@ api.nvim_create_autocmd(
             ---create the buffers and the windows
             ---Look through all the files in the project
             ---create the tasks
-            ---add the tasks to the buffers
+            ---add the tasks to the cache
         end,
     }
 )
