@@ -1,30 +1,51 @@
 local api = require('devplus.tracker.api')
 local database = require("devplus.database")
-local ptr = require("devplus.tasks.interface.ptr")
+local ptr = require("devplus.tasks.ptr")
+local checkmark = require("devplus.tasks.checkmark")
+local eisenhower = require("devplus.eisenhower")
+local themes = require("telescope.themes")
+
 ---@class Setup
 ---@field default table
 ---@field forward function
 local M = {}
 
-M.config = {}
-
+---@class Config
 M.default = {
-    keymaps = function ()
-    end,
-    ---@param buf number
-    ---@return nil
     buffer_keymaps = function (buf)
         api.nvim_buf_set_keymap(buf, "n", "<CR>", "", {
             noremap = true,
             callback = function()
-                ptr.jump_to_task(buf)
+                eisenhower.jump_to_task(buf)
             end,
-            desc = "Jump to task file"
+            desc = "Devplus-Jump: Jump to task file."
         })
     end,
     obsidian = {
-        vault = "",
-        project = "projects/",
+        vault = nil,
+        project = "projects",
+    },
+    telescope = {
+        dyn_title = function(_, task, categories)
+            if task.origin == 'obsidian' then
+                return "Obsidian:" .. task.priority .. task.due_date
+            else
+                return categories[task.category].icon .. ":" .. task.priority
+            end
+        end,
+        attach_mappings = function (_, map)
+            map('n', '>', ptr.toggle)
+            map('n', '+', checkmark.toggle)
+        end,
+        theme_opts = themes.get_dropdown({
+            layout_config = {
+                vertical = {
+                    prompt_position = 'top',
+                },
+            },
+            sorting_strategy = "ascending",
+            border = true,
+        })
     },
     tasks= {
         windows = {
@@ -63,22 +84,16 @@ M.default = {
             }
         },
         time_format = "%y%m%d",
-        ptr_virtual_text = "->"
+        ptr_virtual_text = "->",
     },
     tracker = {
-        interval = 1800, --- Database ingestion every one hour
-        sql_functions = {
-        },
-        visualization = {
-            api.tracker.visualization.bar(),
-        }
+        hook = 1800, --- Database ingestion every time cache is load up to (interval)
     },
-    llm = {
-        type = "", --- Look at supported models (if there's not one of yours, you can implement it yourself)
-        token = "" --- include your API token, be careful!!
-    }
 }
 
+
+---@type Config
+M.config = {}
 
 function M.forward(opts)
     ---@type table<string, function|string|table>
@@ -87,4 +102,3 @@ function M.forward(opts)
 end
 
 return M
-

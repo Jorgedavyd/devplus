@@ -1,20 +1,14 @@
-local categories = require("devplus.setup").config.tasks.categories
-local themes = require("telescope.themes")
 local cache = require("devplus.tasks.cache")
-local decoder = require("devplus.tasks.decoder")
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local previewers = require("telescope.previewers")
 local sorters = require("telescope.sorters")
-local checkmark = require("devplus.tasks.checkmark")
-local ptr = require("devplus.tasks.ptr")
+local decoder = require("devplus.tasks.decoder")
+local config = require("devplus.setup").config.telescope
 
-local cats = vim.tbl_keys(categories)
-
----@class TelescopeTasks
+---@class TelescopeDevplus
 ---@field bufnr number
----@field pickers TelescopePickers
----@field toggle fun():nil
+---@field toggle fun(picker: any):nil
 local M = {}
 
 ---@type number
@@ -23,12 +17,7 @@ M.bufnr = vim.api.nvim_create_buf(false, true)
 ---@private
 local get_previewer = function()
     return previewers.new_buffer_previewer({
-        ---@param _ nil
-        ---@param task Task
-        ---@return string
-        dyn_title = function(_, task)
-            return cats[task.category].icon .. ":" .. task.priority
-        end,
+        dyn_title = config.dyn_title,
         get_buffer_by_name = function(_, _)
             return M.bufnr
         end,
@@ -46,7 +35,7 @@ local get_opts = function ()
     local default_opts = {
         prompt_title = 'Tasks',
         finder = finders.new_table({
-            results = cache.history,
+            results = cache.history, --- Attach the obsidian here as well
             entry_maker = function(task)
                 return {
                     value = task,
@@ -57,28 +46,15 @@ local get_opts = function ()
         }),
         previewer = get_previewer(),
         sorter = sorters.get_generic_fuzzy_sorter(),
-        attach_mappings = function (_, map)
-            map('n', '>', ptr.toggle())
-            map('n', '+', checkmark.toggle())
-        end
+        attach_mappings = config.attach_mappings
     }
 
-    local theme_opts = themes.get_dropdown({
-        layout_config = {
-            vertical = {
-                prompt_position = 'top',
-            },
-        },
-        sorting_strategy = "ascending",
-        border = true,
-    })
+    local theme_opts = config.theme_opts
     return vim.tbl_deep_extend('force', theme_opts, default_opts)
 end
 
-M.picker = pickers.new({}, get_opts())
-
-function M.toggle()
-    M.picker:find()
+function M.picker()
+    return pickers.new({}, get_opts())
 end
 
 return M

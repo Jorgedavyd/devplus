@@ -29,7 +29,7 @@ local help = {
         for idx, filter in ipairs(M.buffers.filters) do
             vim.tbl_extend(vim.tbl_map(function (task)
                 return function ()
-                    local buf_string = decoder.buffer(task)
+                    local buf_string = decoder.telescope(task)
                     vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], -1, -1, false, buf_string)
                 end
             end, vim.tbl_filter(tasks, filter)), output)
