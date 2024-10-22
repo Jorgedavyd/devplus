@@ -22,7 +22,7 @@ local get_previewer = function()
             return M.bufnr
         end,
         define_preview = function(_, task, _)
-            previewers.buffer_previewer_maker(task.value.filepath, M.bufnr, {
+            previewers.buffer_previewer_maker(task.filepath, M.bufnr, {
                 use_ft_detect = true,
                 bufname = "devplus-task-preview",
             })

@@ -5,6 +5,8 @@ local uv = vim.loop
 
 local M = {}
 
+---@type string
+M.grep_string = ""
 
 ---@return string|nil
 local function resolveProject()
@@ -23,15 +25,21 @@ local function resolveProject()
     end
 end
 
----@param task Task
----@return nil
-function M.send (task)
+---@private
+function M.resolveVault()
     local project_path = resolveProject()
     if not project_path then
         log.error("Couldn't find project base directory, project must be a git repository")
     end
     local target = vim.fn.resolve(config.vault .. "/" .. config.project .. "/" .. project_path .. "/todo.md")
+    return target
+end
+
+---@param task Task
+---@return nil
+function M.POST (task)
     local block = parser.singleBlockParser(task)
+    local target =M.resolveVault()
     local file = io.open(target, 'a')
     if file then
         file:write(block)
@@ -39,6 +47,10 @@ function M.send (task)
     else
         log.error("Couldn't open " .. target)
     end
+end
+
+function M.GET ()
+    local target = M.resolveVault()
 end
 
 return M
