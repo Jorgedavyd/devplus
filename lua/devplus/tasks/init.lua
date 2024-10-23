@@ -1,15 +1,16 @@
+local icons = require("devplus.obsidian.icons")
 ---@class Task
----@field due_date number|nil Due date timestamp
+---@field obsidian table
+---@field inline table
 ---@field category number|nil Task category identifier
 ---@field priority number|nil Priority level (1-5)
 ---@field description string|nil Task description
----@field schedule_date string|nil Scheduled date string
----@field start_date string|nil Start date string
----@field created string|nil Creation date string
+---@field schedule_date osdate|nil Scheduled date string
+---@field due_date osdate|nil Due date timestamp
+---@field start_date osdate|nil Start date string
+---@field created osdate|nil Creation date string
 ---@field id string|nil Task identifier
 ---@field recursive string|nil Recurrence pattern
----@field filepath string|nil File path containing the task
----@field line number|nil Line number in file
 ---@field opts TaskOpts Additional task options
 local Task = {}
 Task.__index = Task
@@ -17,6 +18,8 @@ Task.__index = Task
 ---@class TaskOpts
 ---@field extmark_id number|nil Neovim extmark identifier
 ---@field checkmark_status boolean Completion status of the task
+---@field path string|nil File path containing the task
+---@field lnum number|nil Line number in file
 
 -- Create a new task instance
 ---@param opts? table Initial task properties
@@ -24,134 +27,109 @@ Task.__index = Task
 function Task.new(opts)
     local self = setmetatable({}, Task)
     opts = opts or {}
-
-    -- Initialize all fields with provided values or defaults
     self.due_date = opts.due_date
     self.category = opts.category
-    self.priority = opts.priority
+    if opts.priority then
+        if opts.priority >=1 and opts.priority <=5 then
+            self.priority = opts.priority
+        end
+    end
     self.description = opts.description
     self.schedule_date = opts.schedule_date
-    self.start_date = opts.start_date
+    self.start_date = opts.start_date or os.date("%Y-%m-%d")
     self.created = opts.created or os.date("%Y-%m-%d")
     self.id = opts.id
     self.recursive = opts.recursive
-    self.filepath = opts.filepath
-    self.line = opts.line
 
-    -- Initialize task options
     self.opts = {
         extmark_id = opts.extmark_id,
-        checkmark_status = opts.checkmark_status or false
+        checkmark_status = opts.checkmark_status or false,
+        path = opts.path,
+        lnum = opts.lnum,
     }
 
     return self
 end
 
--- Convert task to string representation
-function Task:__tostring()
+---Decodes the input task into markdown obsidian task
+---@param task Task
+---@return string
+function Task.obsidian.decoder(task)
     local parts = {}
-
-    -- Add checkmark status
-    table.insert(parts, self.opts.checkmark_status and "[x]" or "[ ]")
-
-    -- Add priority if set
-    if self.priority then
-        local priority_markers = {"⏬", "🔽", "🔼", "⏫", "🔺"}
-        table.insert(parts, priority_markers[self.priority])
+    table.insert(parts, task.opts.checkmark_status and "- [x]" or "- [ ]")
+    if task.priority then
+        table.insert(parts, icons.priority[task.priority])
     end
-
-    -- Add description
-    if self.description then
-        table.insert(parts, self.description)
+    if task.description then
+        table.insert(parts, task.description)
     end
-
-    -- Add dates and other metadata
-    if self.due_date then
-        table.insert(parts, string.format("📅 (%s)", os.date("%Y-%m-%d", self.due_date)))
+    if task.due_date then
+        table.insert(parts, ("%s (%s)"):format(icons.due_date, os.date("%Y-%m-%d", task.due_date)))
     end
-
-    if self.schedule_date then
-        table.insert(parts, string.format("⏳ (%s)", self.schedule_date))
+    if task.schedule_date then
+        table.insert(parts, string.format("%s (%s)", icons.schedule_date, task.schedule_date))
     end
-
-    if self.start_date then
-        table.insert(parts, string.format("🛫 (%s)", self.start_date))
+    if task.start_date then
+        table.insert(parts, string.format("%s (%s)", icons.start_date, task.start_date))
     end
-
-    if self.created then
-        table.insert(parts, string.format("➕ (%s)", self.created))
+    if task.created then
+        table.insert(parts, string.format("%s (%s)", icons.created, task.created))
     end
-
-    if self.id then
-        table.insert(parts, string.format("🆔 (%s)", self.id))
+    if task.id then
+        table.insert(parts, string.format("%s (%s)", icons.id, task.id))
     end
-
-    if self.recursive then
-        table.insert(parts, string.format("🔁 (%s)", self.recursive))
+    if task.recursive then
+        table.insert(parts, string.format("%s (%s)", icons.recursive, task.recursive))
     end
-
     return table.concat(parts, " ")
 end
 
--- Toggle task completion status
-function Task:toggle_status()
-    self.opts.checkmark_status = not self.opts.checkmark_status
-    return self
-end
-
--- Set task priority
----@param level number Priority level (1-5)
-function Task:set_priority(level)
-    assert(level >= 1 and level <= 5, "Priority must be between 1 and 5")
-    self.priority = level
-    return self
-end
-
--- Set task due date
----@param date_string string Date string in YYYY-MM-DD format
-function Task:set_due_date(date_string)
-    local year, month, day = date_string:match("(%d%d%d%d)-(%d%d)-(%d%d)")
-    assert(year and month and day, "Invalid date format. Expected YYYY-MM-DD")
-    self.due_date = os.time({year = year, month = month, day = day})
-    return self
+---@param task Task
+function Task.toggle_checkmark(task)
+    task.opts.checkmark_status = not task.opts.checkmark_status
+    return task
 end
 
 -- Parse task from string
 ---@param str string Task string to parse
 ---@return Task
-function Task.parse(str)
+function Task.obsidian.encoder(str)
     local opts = {}
 
-    -- Parse checkmark status
-    opts.checkmark_status = str:match("%[x%]") ~= nil
+    local due_date, schedule_date, priority, created, start_date, id, recursive = str:match(icons.grep_string)
 
-    -- Parse dates and metadata
-    local patterns = {
-        {"📅%s*%((.-)%)", "due_date"},
-        {"⏳%s*%((.-)%)", "schedule_date"},
-        {"🛫%s*%((.-)%)", "start_date"},
-        {"➕%s*%((.-)%)", "created"},
-        {"🆔%s*%((.-)%)", "id"},
-        {"🔁%s*%((.-)%)", "recursive"}
-    }
-
-    for _, pattern in ipairs(patterns) do
-        local value = str:match(pattern[1])
-        if value then
-            opts[pattern[2]] = value
-        end
+    if due_date then
+        opts.due_date = due_date
+    end
+    if schedule_date then
+        opts.schedule_date = schedule_date
+    end
+    if start_date then
+        opts.start_date = start_date
+    end
+    if created then
+        opts.created = created
+    end
+    if id then
+        opts.id = id
+    end
+    if recursive then
+        opts.recursive = recursive
     end
 
-    -- Parse priority
-    local priority_markers = {"⏬", "🔽", "🔼", "⏫", "🔺"}
-    for i, marker in ipairs(priority_markers) do
-        if str:find(marker) then
-            opts.priority = i
-            break
+    if priority then
+        for i, prio_symbol in ipairs(icons.priority) do
+            if priority == prio_symbol then
+                opts.priority = i
+                break
+            end
         end
     end
 
     return Task.new(opts)
+end
+
+function Task.inline.encoder(str)
 end
 
 return Task

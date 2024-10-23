@@ -3,7 +3,6 @@ local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local previewers = require("telescope.previewers")
 local sorters = require("telescope.sorters")
-local decoder = require("devplus.tasks.decoder")
 local config = require("devplus.setup").config.telescope
 
 ---@class TelescopeDevplus
@@ -35,12 +34,12 @@ local get_opts = function ()
     local default_opts = {
         prompt_title = 'Tasks',
         finder = finders.new_table({
-            results = cache.history, --- Attach the obsidian here as well
+            results = cache.history,
             entry_maker = function(task)
                 return {
                     value = task,
-                    display = decoder.telescope(task),
-                    ordinal = sorters.default(task),
+                    display = config.display(task),
+                    ordinal = config.sorter(task)
                 }
             end
         }),

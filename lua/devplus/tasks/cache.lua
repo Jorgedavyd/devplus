@@ -10,10 +10,10 @@ M.history = {}
 ---cache.append: Adds the tasks to the buffer
 ---if they don't exist at cache. Additionally creates
 ---some ingestion to the database.
----@param buf_tasks table<number, Task>
+---@param tasks Task[]
 ---@return nil
-function M.append(buf_tasks)
-    for _, new_task in ipairs(buf_tasks) do
+function M.append(tasks)
+    for _, new_task in ipairs(tasks) do
         local flag = 0
         for _, old_task in ipairs(M.history) do
             if old_task then
@@ -23,8 +23,9 @@ function M.append(buf_tasks)
                 end
             end
         end
-        if flag == 1 then
+        if flag == 0 then
             table.insert(M.history, new_task)
+            queue.ingest.tasks(new_task)
         end
     end
 end

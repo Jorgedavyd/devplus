@@ -4,6 +4,7 @@ local ptr = require("devplus.tasks.ptr")
 local checkmark = require("devplus.tasks.checkmark")
 local eisenhower = require("devplus.eisenhower")
 local themes = require("telescope.themes")
+local sorter = require("devplus.tasks.sorter")
 
 ---@class Setup
 ---@field default table
@@ -16,7 +17,7 @@ M.default = {
         api.nvim_buf_set_keymap(buf, "n", "<CR>", "", {
             noremap = true,
             callback = function()
-                eisenhower.jump_to_task(buf)
+                eisenhower.jump(buf)
             end,
             desc = "Devplus-Jump: Jump to task file."
         })
@@ -45,10 +46,16 @@ M.default = {
             },
             sorting_strategy = "ascending",
             border = true,
-        })
+        }),
+        display = function (task)
+            return Config.categories[task.category].icon .. icons.priority[task.priority] .. (":%s"):format(task.description)
+        end,
+        sorter = function (task)
+            return sorter.default(task)
+        end
     },
     tasks= {
-        windows = {
+        matrix = {
             filters = {
                 {
                     function (task)
@@ -96,7 +103,6 @@ M.default = {
 M.config = {}
 
 function M.forward(opts)
-    ---@type table<string, function|string|table>
     M.config = vim.tbl_deep_extend('force', opts, M.default)
     database.forward(opts.tracker)
 end
