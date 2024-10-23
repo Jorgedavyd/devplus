@@ -1,3 +1,4 @@
+local logs = require("devplus.logs")
 ---@class DatabaseResult
 ---@field success boolean
 ---@field affected_rows number|nil
@@ -11,6 +12,10 @@ local db_path = vim.fn.stdpath('data') .. '/devplus.db'
 local ok, err = pcall(function()
     M.database = sqlite3.open(db_path)
 end)
+
+if err and not ok then
+    logs.error("Couldn't access the  devplus.db database")
+end
 
 ---Execute an SQL statement with parameters
 ---@param sql string The SQL query to execute
@@ -73,7 +78,6 @@ function M.bulk_ingest(table_id, fields, data)
         return { success = false, error = "Invalid or empty data array" }
     end
 
-    -- Sanitize table_id to prevent SQL injection
     if not table_id:match("^[%w_]+$") then
         return { success = false, error = "Invalid table name format" }
     end
@@ -122,7 +126,9 @@ M.tasks = {
         elseif not task.priority then
             return { success = false, error = "Task must have a priority" }
         end
-        --- Setup the rest
+
+        local query = [[
+            ]]
     end,
 
     ---Record task metadata
