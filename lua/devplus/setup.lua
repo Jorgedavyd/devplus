@@ -13,30 +13,13 @@ local M = {}
 
 ---@class Config
 M.default = {
-    buffer_keymaps = function (buf)
-        api.nvim_buf_set_keymap(buf, "n", "<CR>", "", {
-            noremap = true,
-            callback = function()
-                eisenhower.jump(buf)
-            end,
-            desc = "Devplus-Jump: Jump to task file."
-        })
-    end,
     obsidian = {
         vault = nil,
         project = "projects",
     },
     telescope = {
-        dyn_title = function(_, task, categories)
-            if task.origin == 'obsidian' then
-                return "Obsidian:" .. task.priority .. task.due_date
-            else
-                return categories[task.category].icon .. ":" .. task.priority
-            end
-        end,
-        attach_mappings = function (_, map)
-            map('n', '>', ptr.toggle)
-            map('n', '+', checkmark.toggle)
+        dyn_title = function(_, task)
+            return Config.tasks.categories[task.category].icon .. ":" .. task.priority
         end,
         theme_opts = themes.get_dropdown({
             layout_config = {
@@ -48,7 +31,11 @@ M.default = {
             border = true,
         }),
         display = function (task)
-            return Config.categories[task.category].icon .. icons.priority[task.priority] .. (":%s"):format(task.description)
+            return Config.tasks.categories[task.category].icon .. icons.priority[task.priority] .. (":%s"):format(task.description)
+        end,
+        attach_mappings = function (_, map)
+            map('n', '>', ptr.toggle)
+            map('n', '+', checkmark.toggle)
         end,
         sorter = function (task)
             return sorter.default(task)
@@ -77,7 +64,14 @@ M.default = {
             config = {
                 style = 'minimal',
                 border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
-            }
+            },
+            display = function (task)
+                return Config.tasks.categories[task.category].icon .. icons.priority[task.priority] .. (":%s"):format(task.description)
+            end,
+            buffer_mappings = function (_, map)
+                map('n', '>', ptr.toggle)
+                map('n', '+', checkmark.toggle)
+            end,
         },
         categories = {
             TODO = {
@@ -92,6 +86,8 @@ M.default = {
         },
         time_format = "%y%m%d",
         ptr_virtual_text = "->",
+        undone_virtual_text = "",
+        done_virtual_text = "",
     },
     tracker = {
         hook = 1800, --- Database ingestion every time cache is load up to (interval)

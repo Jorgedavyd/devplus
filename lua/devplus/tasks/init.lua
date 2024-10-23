@@ -1,25 +1,45 @@
 local icons = require("devplus.obsidian.icons")
+local config = require("devplus.tasks.time_format")
+local logs = require("devplus.logs")
 ---@class Task
 ---@field obsidian table
 ---@field inline table
----@field category number|nil Task category identifier
----@field priority number|nil Priority level (1-5)
----@field description string|nil Task description
----@field schedule_date osdate|nil Scheduled date string
----@field due_date osdate|nil Due date timestamp
----@field start_date osdate|nil Start date string
----@field created osdate|nil Creation date string
----@field id string|nil Task identifier
----@field recursive string|nil Recurrence pattern
+---@field category number? Task category identifier
+---@field priority number? Priority level (1-5)
+---@field description string? Task description
+---@field schedule_date integer? Scheduled date string
+---@field due_date integer? Due date timestamp
+---@field start_date integer? Start date string
+---@field created integer? Creation date string
+---@field id string? Task identifier
+---@field recursive string? Recurrence pattern
 ---@field opts TaskOpts Additional task options
 local Task = {}
 Task.__index = Task
 
 ---@class TaskOpts
----@field extmark_id number|nil Neovim extmark identifier
+---@field extmark_id number? Neovim extmark identifier
 ---@field checkmark_status boolean Completion status of the task
----@field path string|nil File path containing the task
----@field lnum number|nil Line number in file
+---@field path string? File path containing the task
+---@field lnum number? Line number in file
+---@field buffers number[][]? matrix buffers and line numbers for idx
+
+---@param date_str? string
+---@param pattern? string
+---@return integer?
+local function strftime(date_str, pattern)
+    if date_str and pattern then
+        local year, month, day = date_str:match(pattern)
+        if year and month and day then
+            return os.time({
+                year = tonumber(year),
+                month = tonumber(month),
+                day = tonumber(day),
+            })
+        end
+        logs.error("Not valid date_str")
+    end
+end
 
 -- Create a new task instance
 ---@param opts? table Initial task properties
@@ -27,7 +47,7 @@ Task.__index = Task
 function Task.new(opts)
     local self = setmetatable({}, Task)
     opts = opts or {}
-    self.due_date = opts.due_date
+    self.due_date = strftime(opts.due_date, config.time_format)
     self.category = opts.category
     if opts.priority then
         if opts.priority >=1 and opts.priority <=5 then
@@ -35,9 +55,9 @@ function Task.new(opts)
         end
     end
     self.description = opts.description
-    self.schedule_date = opts.schedule_date
-    self.start_date = opts.start_date or os.date("%Y-%m-%d")
-    self.created = opts.created or os.date("%Y-%m-%d")
+    self.schedule_date = strftime(opts.schedule_date, config.time_format)
+    self.start_date = strftime(opts.start_date, config.time_format)
+    self.created = strftime(opts.created, config.time_format)
     self.id = opts.id
     self.recursive = opts.recursive
 
@@ -67,13 +87,13 @@ function Task.obsidian.decoder(task)
         table.insert(parts, ("%s (%s)"):format(icons.due_date, os.date("%Y-%m-%d", task.due_date)))
     end
     if task.schedule_date then
-        table.insert(parts, string.format("%s (%s)", icons.schedule_date, task.schedule_date))
+        table.insert(parts, string.format("%s (%s)", icons.schedule_date, os.date("%Y-%m-%d", task.schedule_date)))
     end
     if task.start_date then
-        table.insert(parts, string.format("%s (%s)", icons.start_date, task.start_date))
+        table.insert(parts, string.format("%s (%s)", icons.start_date, os.date("%Y-%m-%d", task.start_date)))
     end
     if task.created then
-        table.insert(parts, string.format("%s (%s)", icons.created, task.created))
+        table.insert(parts, string.format("%s (%s)", icons.created, os.date("%Y-%m-%d", task.created)))
     end
     if task.id then
         table.insert(parts, string.format("%s (%s)", icons.id, task.id))
@@ -127,9 +147,6 @@ function Task.obsidian.encoder(str)
     end
 
     return Task.new(opts)
-end
-
-function Task.inline.encoder(str)
 end
 
 return Task

@@ -1,5 +1,5 @@
 local api = vim.api
-local config = require("devplus.setup").config.cache
+local config = require("devplus.setup").config.tasks
 local cache = require("devplus.tasks.cache")
 
 ---@class Checkmark
@@ -35,7 +35,7 @@ end
 function M.mark(bufnr, current_line)
     cache[current_line].opts.checkmark_status = true
     vim.api.nvim_buf_set_extmark(bufnr, M.namespace, current_line, 0, {
-        virt_text = {{config.icon, "Comment"}},
+        virt_text = {{config.done_virtual_text, "Comment"}},
         virt_text_pos = 'overlay',
         virt_text_win_col = 0,
     })
@@ -49,7 +49,7 @@ end
 function M.unmark(bufnr, current_line)
     cache[current_line].opts.checkmark_status = false
     vim.api.nvim_buf_set_extmark(bufnr, M.namespace, current_line, 0, {
-        virt_text = {{config.icon, "Comment"}},
+        virt_text = {{config.undone_virtual_text, "Comment"}},
         virt_text_pos = 'overlay',
         virt_text_win_col = 0,
     })

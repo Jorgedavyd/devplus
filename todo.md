@@ -1,7 +1,6 @@
 # TODO
 - [ ] Eisenhower
     - [ ] Default
-- [ ] Add <C-m> in eisenhower buffer to jump to the task in hand.
 - [ ] Solve linting and extmarks for the results buffer for each task. (Or find another way of displaying tasks in telescope)
 - [ ] Add obsidian tasks to cache.
 

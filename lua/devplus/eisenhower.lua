@@ -1,8 +1,8 @@
 local utils = require("devplus.tasks.utils")
 local logs = require("devplus.logs")
-local decoder = require("devplus.tasks.decoder")
 local config = require("devplus.setup").config
 local log = require("devplus.logs")
+local cache = require("devplus.tasks.cache")
 
 ---@class Matrix
 ---@field buffers Buffers
@@ -44,13 +44,12 @@ function M.getWindowsConfig(filters, row_size, row, col_size, col)
         end
         return opts
     elseif type(filters) == "function" then
-        local height, width = vim.o.lines, math.floor(vim.o.columns * 5 / 8)
-        local shift = vim.o.columns - width
+        local height, width = vim.o.lines, vim.o.columns
         return vim.tbl_extend('force', {
             width = math.floor(height / row_size),
             height = math.floor(width / col_size),
             row = row,
-            col = shift + col,
+            col = col,
         }, config.tasks.matrix.config or {})
     end
     return opts
@@ -109,7 +108,7 @@ local help = {
         for idx, filter in ipairs(M.buffers.filters) do
             vim.tbl_extend(vim.tbl_map(function (task)
                 return function ()
-                    local buf_string = decoder.telescope(task)
+                    local buf_string = config.tasks.display(task)
                     vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], -1, -1, false, buf_string)
                 end
             end, vim.tbl_filter(tasks, filter)), output)
@@ -130,7 +129,7 @@ M.manager = {
             local buf = vim.api.nvim_create_buf(false, true)
             vim.api.nvim_buf_set_option(buf, 'modifiable', false)
             vim.api.nvim_buf_set_option(buf, 'buftype', 'nofile')
-            config.buffer_keymaps(buf)
+            config.tasks.buffer_keymaps(buf)
             M.buffers.filters[idx] = filters[idx]
             M.buffers.bufnrs[idx] = buf
             M.buffers.opts[idx] = M.config[idx]
@@ -181,6 +180,17 @@ function M.toggle()
 end
 
 function M.jump()
+    local bufnr = vim.api.nvim_get_current_buf()
+    local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
+    local output = vim.tbl_filter(function(x)
+        return vim.tbl_contains(x.opts.buffers, {bufnr, lnum})
+    end, cache.history)
+    assert(#output == 1, "An error occurred while processing the Task.opts.buffers for indexing")
+    output = output[1]
+    local filepath = output.opts.path
+    local line_number = output.opts.lnum
+    vim.cmd("edit " .. filepath)
+    vim.api.nvim_win_set_cursor(0, {line_number + 1, 0})
 end
 
 return M
