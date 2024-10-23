@@ -127,7 +127,7 @@ function M.forward(opts)
     local base_config = vim.tbl_deep_extend('force', default_config, opts or {})
     local dependent_config = create_dependent_config(base_config)
     M.config = vim.tbl_deep_extend('force', base_config, dependent_config, opts or {})
-    database.forward(M.config.tracker)
+    database.init()
 end
 
 _G.Config = M.config

@@ -346,4 +346,4 @@ M.projects = {
     }
 }
 
-return M
+_G.db = M
