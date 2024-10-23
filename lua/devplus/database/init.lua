@@ -1,7 +1,5 @@
 local sqlite3 = require('lsqlite3')
----@class RawAPI
----@field GET function
----@field POST function
+---@class Database
 local M = {}
 
 M.database = nil
