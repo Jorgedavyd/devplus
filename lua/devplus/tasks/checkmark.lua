@@ -1,6 +1,5 @@
+local config = _G.Config.tasks or {}
 local api = vim.api
-local config = require("devplus.setup").config.tasks
-local cache = require("devplus.tasks.cache")
 
 ---@class Checkmark
 ---@field toggle function
@@ -17,7 +16,7 @@ M.namespace = api.nvim_create_namespace("devplus-checkmark")
 function M.toggle()
     local bufnr = vim.api.nvim_get_current_buf()
     local current_line = vim.api.nvim_win_get_cursor(0)[1] - 1
-    local task = cache[current_line].opts
+    local task = _G.cache[current_line].opts
     if task then
         if task.checkmark_status then
             M.unmark(bufnr, current_line)
@@ -33,7 +32,7 @@ end
 ---@param current_line number
 ---@return nil
 function M.mark(bufnr, current_line)
-    cache[current_line].opts.checkmark_status = true
+    _G.cache[current_line].opts.checkmark_status = true
     vim.api.nvim_buf_set_extmark(bufnr, M.namespace, current_line, 0, {
         virt_text = {{config.done_virtual_text, "Comment"}},
         virt_text_pos = 'overlay',
@@ -47,7 +46,7 @@ end
 ---@param current_line number
 ---@return nil
 function M.unmark(bufnr, current_line)
-    cache[current_line].opts.checkmark_status = false
+    _G.cache[current_line].opts.checkmark_status = false
     vim.api.nvim_buf_set_extmark(bufnr, M.namespace, current_line, 0, {
         virt_text = {{config.undone_virtual_text, "Comment"}},
         virt_text_pos = 'overlay',

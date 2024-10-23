@@ -11,10 +11,10 @@ api.nvim_create_autocmd(
     {
         group = M.buffer_id,
         callback = function ()
-            ---create the buffers and the windows
+            require("devplus.matrix").manager.init()
             ---Look through all the files in the project
             ---create the tasks
-            ---add the tasks to the cache
+            require("devplus.tasks.cache").append(tasks)
         end,
     }
 )

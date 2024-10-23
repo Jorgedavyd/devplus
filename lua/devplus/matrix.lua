@@ -1,8 +1,7 @@
+local config = _G.Config or {}
 local utils = require("devplus.tasks.utils")
 local logs = require("devplus.logs")
-local config = require("devplus.setup").config
 local log = require("devplus.logs")
-local cache = require("devplus.tasks.cache")
 
 ---@class Matrix
 ---@field buffers Buffers
@@ -133,16 +132,16 @@ function M.toggle()
         if not is_interface_open then
             for idx, filter in ipairs(M.buffers.filters) do
                 vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], 0, -1, false, {})
-                local keys = vim.tbl_keys(cache.history)
+                local keys = vim.tbl_keys(_G.cache.history)
                 local tasks = vim.tbl_filter(function (x)
-                    return filter(cache.history[x])
+                    return filter(_G.cache.history[x])
                 end, keys)
                 keys = vim.tbl_keys(tasks)
                 for i=1,keys do
-                    table.insert(cache.history[tasks[i]].opts.buffers, {bufnr = M.buffers.bufnrs[idx], lnum = i})
+                    table.insert(_G.cache.history[tasks[i]].opts.buffers, {bufnr = M.buffers.bufnrs[idx], lnum = i})
                 end
                 local buf_string = vim.tbl_map(function (x)
-                    return config.tasks.matrix.display(cache.history[x])
+                    return config.tasks.matrix.display(_G.cache.history[x])
                 end, tasks)
                 vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], -1, -1, false, buf_string)
                 vim.api.nvim_open_win(M.buffers.bufnrs[idx], false, M.buffers.opts[idx])
@@ -167,7 +166,7 @@ function M.jump()
     local lnum = vim.api.nvim_win_get_cursor(0)[1] - 1
     local output = vim.tbl_filter(function(x)
         return vim.tbl_contains(x.opts.buffers, {bufnr, lnum})
-    end, cache.history)
+    end, _G.cache.history)
     if #output == 0 then
         log.error("No matching task found for the current buffer and line.")
         return

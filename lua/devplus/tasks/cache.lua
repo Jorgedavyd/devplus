@@ -30,4 +30,4 @@ function M.append(tasks)
     end
 end
 
-return M
+_G.cache = M

@@ -1,8 +1,6 @@
+local categories = _G.Config.tasks.categories
 local parsers = require("nvim-treesitter.parsers")
 local logs = require("devplus.logs")
-local encoder = require("devplus.tasks.encoder")
-local categories = require("devplus.setup").config.tasks.categories
-local cache = require("devplus.tasks.cache")
 
 local M = {}
 
@@ -44,9 +42,10 @@ function M.current_update()
         end
     end
     if output then
-        cache.append(output)
+        _G.cache.append(output)
     end
 end
 
-return M
 
+
+return M

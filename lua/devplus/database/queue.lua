@@ -3,10 +3,14 @@
 ---@field affected_rows number|nil
 ---@field error string|nil
 
-local raw = require('devplus.database.raw')
+local sqlite3 = require('lsqlite3')
 
 local M = {}
 
+local db_path = vim.fn.stdpath('data') .. '/devplus.db'
+local ok, err = pcall(function()
+    M.database = sqlite3.open(db_path)
+end)
 
 ---Execute an SQL statement with parameters
 ---@param sql string The SQL query to execute
@@ -16,7 +20,7 @@ local function exec_sql(sql, params)
     local success, result
 
     success, result = pcall(function()
-        local stmt = assert(raw.database:prepare(sql))
+        local stmt = assert(M.database:prepare(sql))
         local res = stmt:bind_values(table.unpack(params)):step()
         stmt:reset()
         return res
@@ -31,7 +35,7 @@ local function exec_sql(sql, params)
 
     return {
         success = true,
-        affected_rows = raw.database:changes()
+        affected_rows = M.database:changes()
     }
 end
 

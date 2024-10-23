@@ -1,6 +1,7 @@
 local icons = require("devplus.obsidian.icons")
-local config = require("devplus.tasks.time_format")
 local logs = require("devplus.logs")
+local config = _G.Config.tasks
+
 ---@class Task
 ---@field obsidian table
 ---@field inline table

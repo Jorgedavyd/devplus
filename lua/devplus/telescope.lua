@@ -1,9 +1,8 @@
-local cache = require("devplus.tasks.cache")
+local config = _G.Config.telescope or {}
 local pickers = require("telescope.pickers")
 local finders = require("telescope.finders")
 local previewers = require("telescope.previewers")
 local sorters = require("telescope.sorters")
-local config = require("devplus.setup").config.telescope
 
 ---@class TelescopeDevplus
 ---@field bufnr number
@@ -34,7 +33,7 @@ local get_opts = function ()
     local default_opts = {
         prompt_title = 'Tasks',
         finder = finders.new_table({
-            results = cache.history,
+            results = vim.tbl_filter(function (x) return not x.opts.checkmark_status end, _G.cache.history),
             entry_maker = function(task)
                 return {
                     value = task,

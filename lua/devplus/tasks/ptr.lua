@@ -1,4 +1,4 @@
-local config = require("devplus.setup").config.tasks
+local config = _G.Config.tasks
 local ingest = require("devplus.database.ingestion")
 local queue = require("devplus.database.queue")
 local api = vim.api

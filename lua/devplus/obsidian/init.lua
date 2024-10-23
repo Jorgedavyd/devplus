@@ -1,6 +1,6 @@
 local log = require("devplus.logs")
-local config = require("devplus.setup").config.obsidian
 local parser = require("devplus.obsidian.parser")
+local config = _G.Config.obsidian
 local uv = vim.loop
 
 local M = {}
