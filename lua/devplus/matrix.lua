@@ -98,25 +98,6 @@ M.config = M.getWindowsConfig(config.tasks.matrix.filters)
 ---@field opts Opts
 M.buffers = {}
 
----@private
----@class HelperFunctions
-local help = {
-    ---@param tasks Task[]
-    ---@return function[]
-    get_write_tasks = function (tasks)
-        local output = {}
-        for idx, filter in ipairs(M.buffers.filters) do
-            vim.tbl_extend(vim.tbl_map(function (task)
-                return function ()
-                    local buf_string = config.tasks.display(task)
-                    vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], -1, -1, false, buf_string)
-                end
-            end, vim.tbl_filter(tasks, filter)), output)
-        end
-        return output
-    end,
-}
-
 ---@class BufferManager
 ---@field checkUpdates function This is for the autocmd each time a buffer is written.
 ---@field init function On init autocmd to setup (lazy) the buffers.
@@ -135,17 +116,6 @@ M.manager = {
             M.buffers.opts[idx] = M.config[idx]
         end
     end,
-    ---BufferManager.update: Updates the task buffers
-    ---@param tasks? Task[]
-    update = function (tasks)
-        if tasks then
-            local task_functions = help.get_write_tasks(tasks)
-            local success, _ = pcall(vim.tbl_map(function(x) x() end, task_functions))
-            if not success then
-                log.error("Couldn't write tasks")
-            end
-        end
-    end
 }
 
 function M.toggle()
@@ -161,8 +131,21 @@ function M.toggle()
 
     vim.defer_fn(function()
         if not is_interface_open then
-            for idx, buf in ipairs(M.buffers.bufnrs) do
-                vim.api.nvim_open_win(buf, false, M.buffers.opts[idx])
+            for idx, filter in ipairs(M.buffers.filters) do
+                vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], 0, -1, false, {})
+                local keys = vim.tbl_keys(cache.history)
+                local tasks = vim.tbl_filter(function (x)
+                    return filter(cache.history[x])
+                end, keys)
+                keys = vim.tbl_keys(tasks)
+                for i=1,keys do
+                    table.insert(cache.history[tasks[i]].opts.buffers, {bufnr = M.buffers.bufnrs[idx], lnum = i})
+                end
+                local buf_string = vim.tbl_map(function (x)
+                    return config.tasks.matrix.display(cache.history[x])
+                end, tasks)
+                vim.api.nvim_buf_set_lines(M.buffers.bufnrs[idx], -1, -1, false, buf_string)
+                vim.api.nvim_open_win(M.buffers.bufnrs[idx], false, M.buffers.opts[idx])
             end
         else
             local wins = vim.api.nvim_list_wins()
@@ -185,10 +168,20 @@ function M.jump()
     local output = vim.tbl_filter(function(x)
         return vim.tbl_contains(x.opts.buffers, {bufnr, lnum})
     end, cache.history)
-    assert(#output == 1, "An error occurred while processing the Task.opts.buffers for indexing")
+    if #output == 0 then
+        log.error("No matching task found for the current buffer and line.")
+        return
+    elseif #output > 1 then
+        log.error("Multiple tasks found. This shouldn't happen.")
+        return
+    end
     output = output[1]
     local filepath = output.opts.path
     local line_number = output.opts.lnum
+    if vim.fn.filereadable(filepath) == 0 then
+        log.error("The file does not exist: " .. filepath)
+        return
+    end
     vim.cmd("edit " .. filepath)
     vim.api.nvim_win_set_cursor(0, {line_number + 1, 0})
 end

@@ -49,8 +49,4 @@ function M.POST (task)
     end
 end
 
-function M.GET ()
-    local target = M.resolveVault()
-end
-
 return M
