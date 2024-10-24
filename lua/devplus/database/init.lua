@@ -80,7 +80,7 @@ M.tasks = {
                 due_date DATETIME,
                 created DATETIME,
                 priority INTEGER,
-                finish_date DATETIME,
+                end_date DATETIME,
                 source INTEGER,
                 FOREIGN KEY(category) REFERENCES category_id(id) ON DELETE CASCADE,
                 FOREIGN KEY(file) REFERENCES file_id(id) ON DELETE CASCADE,
@@ -207,8 +207,8 @@ M.ptr_records = {
             CREATE TABLE IF NOT EXISTS ptr_record (
                 id INTEGER PRIMARY KEY,
                 task INTEGER,
-                begin DATETIME,
-                end DATETIME,
+                begin_time DATETIME,
+                time INTEGER,
                 FOREIGN KEY(task) REFERENCES task_id(id) ON DELETE CASCADE
             );
         ]]
@@ -231,13 +231,11 @@ M.buffer_records = {
             CREATE TABLE IF NOT EXISTS buffer_record (
                 id INTEGER PRIMARY KEY,
                 file INTEGER,
-                project INTEGER,
-                begin DATETIME,
+                begin_time DATETIME,
+                end_time DATETIME,
+                editing_time INTEGER,
                 lines_added INTEGER,
-                end DATETIME,
-                editing_time INTERVAL,
                 FOREIGN KEY(file) REFERENCES file_id(id) ON DELETE CASCADE,
-                FOREIGN KEY(project) REFERENCES projects(id) ON DELETE CASCADE
             );
         ]]
     end,
@@ -269,20 +267,20 @@ M.editing_time = {
         M.database:exec[[
             CREATE TABLE IF NOT EXISTS editing_time (
                 id INTEGER PRIMARY KEY,
-                record_id INTEGER,
-                begin DATETIME,
-                end DATETIME,
-                editing_time INTERVAL,
-                project_id INTEGER,
+                file INTEGER,
+                record INTEGER,
+                init_time DATETIME,
+                end_time DATETIME,
+                editing_time INTEGER,
                 FOREIGN KEY(record_id) REFERENCES buffer_record(id) ON DELETE CASCADE,
-                FOREIGN KEY(project_id) REFERENCES projects(id) ON DELETE CASCADE
+                FOREIGN KEY(file) REFERENCES project_id(id) ON DELETE CASCADE
             );
         ]]
     end,
     ingest = function()
         M.ingest(
             "editing_time",
-            {"record_id", "begin", "end", "editing_time", "project_id"},
+            {"record_id", "begin_time", "end_time", "editing_time", "project_id"},
             M.editing_time.queue.data
         )
         M.editing_time.queue.data = {}
@@ -306,10 +304,10 @@ M.breaks = {
         M.database:exec[[
             CREATE TABLE IF NOT EXISTS breaks (
                 id INTEGER PRIMARY KEY,
-                file_id INTEGER,
+                file INTEGER,
                 date DATETIME,
                 time INTEGER,
-                FOREIGN KEY(file_id) REFERENCES files(id) ON DELETE CASCADE
+                FOREIGN KEY(file) REFERENCES file_id(id) ON DELETE CASCADE
             );
         ]]
     end,
