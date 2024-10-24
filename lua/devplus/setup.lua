@@ -42,6 +42,7 @@ local default_config = {
         ptr_virtual_text = "->",
         undone_virtual_text = "",
         done_virtual_text = "",
+        inline_format = "{category, due_date, priority} description"
     },
     tracker = {
         hook = 1800,
@@ -51,30 +52,43 @@ local default_config = {
 local function create_dependent_config(base_config)
     return {
         telescope = {
-            dyn_title = function(_, task)
-                return base_config.tasks.categories[task.category].icon .. ":" .. task.priority
-            end,
-            theme_opts = themes.get_dropdown({
-                layout_config = {
-                    vertical = {
-                        prompt_position = 'top',
+            find_tasks = {
+                dyn_title = function(_, task)
+                    return base_config.tasks.categories[task.category].icon .. ":" .. task.priority
+                end,
+                theme_opts = themes.get_dropdown({
+                    layout_config = {
+                        vertical = {
+                            prompt_position = 'top',
+                        },
                     },
-                },
-                sorting_strategy = "ascending",
-                border = true,
-            }),
-            display = function(task)
-                return base_config.tasks.categories[task.category].icon
-                    .. icons.priority[task.priority]
-                    .. (":%s"):format(task.description)
-            end,
-            attach_mappings = function(_, map)
-                map('n', '>', ptr.toggle)
-                map('n', '+', checkmark.toggle)
-            end,
-            sorter = function(task)
-                return sorter.default(task)
-            end
+                    sorting_strategy = "ascending",
+                    border = true,
+                }),
+                display = function(task)
+                    return base_config.tasks.categories[task.category].icon
+                        .. icons.priority[task.priority]
+                        .. (":%s"):format(task.description)
+                end,
+                attach_mappings = function(_, map)
+                    map('n', '>', ptr.toggle)
+                    map('n', '+', checkmark.toggle)
+                end,
+                sorter = function(task)
+                    return sorter.default(task)
+                end
+            },
+            snippets = {
+                theme_opts = themes.get_dropdown({
+                    layout_config = {
+                        vertical = {
+                            prompt_position = 'top',
+                        },
+                    },
+                    sorting_strategy = "ascending",
+                    border = true,
+                })
+            }
         },
         tasks = vim.tbl_extend("force", base_config.tasks, {
             matrix = {
