@@ -25,7 +25,6 @@ local function resolveProject()
     end
 end
 
----@private
 function M.resolveVault()
     local project_path = resolveProject()
     if not project_path then

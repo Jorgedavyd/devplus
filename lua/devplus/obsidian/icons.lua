@@ -27,7 +27,7 @@ TaskMeta.schedule_date = "⏳"  -- Schedule date marker
 TaskMeta.id = "🆔"            -- ID marker
 TaskMeta.recursive = "🔁"      -- Recursive task marker
 
-TaskMeta.grep_string = ("%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s|➕\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)"):format(
+TaskMeta.grep_string = ("- [ ] %s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s|➕\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)"):format(
     TaskMeta.due_date,        -- 📅 (due date)
     TaskMeta.schedule_date,   -- ⏳ (schedule date)
     table.concat(TaskMeta.priority, "|"),  -- Any priority symbol (⏬|🔽|🔼|⏫|🔺)
