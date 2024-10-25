@@ -153,7 +153,7 @@ local function get_format()
         return nil, nil
     end
     local format_keys = {}
-    for key in vim.iter(task) do
+    for key in vim.iter(Task) do
         local start_pos, end_pos = string.find(grep_string, key)
         if start_pos and end_pos then
             table.insert(format_keys, {
