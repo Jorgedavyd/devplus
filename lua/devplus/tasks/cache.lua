@@ -1,5 +1,3 @@
-local queue = require("devplus.database.queue")
-
 ---@class Cache
 ---@field history table<number, Task>
 local M = {}
@@ -25,7 +23,7 @@ function M.append(tasks)
         end
         if flag == 0 then
             table.insert(M.history, new_task)
-            queue.ingest.tasks(new_task)
+            _G.db.tasks.queue.append(new_task)
         end
     end
 end

@@ -28,15 +28,11 @@ Task.__index = Task
 ---@param date_str? string
 ---@param pattern? string
 ---@return integer?
-local function strftime(date_str, pattern)
+local function strptime(date_str, pattern)
     if date_str and pattern then
         local year, month, day = date_str:match(pattern)
         if year and month and day then
-            return os.time({
-                year = tonumber(year),
-                month = tonumber(month),
-                day = tonumber(day),
-            })
+            return os.time({ year = tonumber(year), month = tonumber(month), day = tonumber(day) })
         end
         logs.error("Not valid date_str")
     end
@@ -48,17 +44,17 @@ end
 function Task.new(opts)
     local self = setmetatable({}, Task)
     opts = opts or {}
-    self.due_date = strftime(opts.due_date, config.time_format)
+    self.due_date = strptime(opts.due_date, config.time_format)
     self.category = opts.category
     if opts.priority then
         if opts.priority >=1 and opts.priority <=5 then
             self.priority = opts.priority
         end
     end
-    self.description = opts.description
-    self.schedule_date = strftime(opts.schedule_date, config.time_format)
-    self.start_date = strftime(opts.start_date, config.time_format)
-    self.created = strftime(opts.created, config.time_format)
+    self.description = opts.description or ""
+    self.schedule_date = strptime(opts.schedule_date, config.time_format)
+    self.start_date = strptime(opts.start_date, config.time_format) or os.time()
+    self.created = strptime(opts.created, config.time_format) or os.time()
     self.id = opts.id
     self.recursive = opts.recursive
 
@@ -149,5 +145,43 @@ function Task.obsidian.encoder(str)
 
     return Task.new(opts)
 end
+
+local function get_format()
+    local grep_string = _G.Config.tasks.inline_format
+    if not string.find(grep_string, "category") then
+        logs.error("Invalid format string: TODOs require a category/namespace")
+        return nil, nil
+    end
+    local format_keys = {}
+    for key in vim.iter(task) do
+        local start_pos, end_pos = string.find(grep_string, key)
+        if start_pos and end_pos then
+            table.insert(format_keys, {
+                key = key,
+                start_pos = start_pos,
+                end_pos = end_pos,
+                text = string.sub(grep_string, start_pos, end_pos)
+            })
+            grep_string, _ = string.gsub(grep_string, key, "(.)")
+        end
+    end
+    table.sort(format_keys, function(a, b) return a.position < b.position end)
+    return grep_string, format_keys
+end
+
+
+function Task.inline.encoder(str)
+    local fmt, format_keys = get_format()
+    local opts = {}
+    if fmt and format_keys then
+        local group = string.match(str, fmt)
+        assert(#group == #format_keys, "Not valid pattern, find length mismatch")
+        for idx, _ in ipairs(group) do
+            opts[format_keys[idx]] = group[idx]
+        end
+    end
+    return Task.new(opts)
+end
+
 
 return Task

@@ -1,4 +1,5 @@
 local categories = _G.Config.tasks.categories
+local tasks = require("devplus.tasks")
 local parsers = require("nvim-treesitter.parsers")
 local logs = require("devplus.logs")
 
@@ -33,7 +34,7 @@ function M.current_update()
             if match then
                 local text = vim.treesitter.get_node_text(match, 0)
                 if text then
-                    local task = encoder.buffer(text)
+                    local task = tasks.inline.encoder(text)
                     if task then
                         table.insert(output, task)
                     end
