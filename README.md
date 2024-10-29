@@ -1,7 +1,7 @@
 <div align="center">
   <h1>devplus</h1>
   <p>
-    <img src="assets/logo.png" align="center" alt="Logo" />
+    <img src="source/logo.png" align="center" alt="Logo" />
   </p>
   <p>
     neodev tools for productivity tracking with
