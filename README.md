@@ -15,7 +15,7 @@ The goal of **devplus** is to provide a non-blocking framework towards developer
 The **devplus** plugin consists on:
 1. Versatile task management for a variety of frameworks.
 2. Constant tracking of buffer timings, task completion, lines of code created, among others.
-3. Synchronization with [Obsidian](https://obsidian.md/) **GET** and **POST** for Tasks.
+3. Synchronization with [Obsidian](https://obsidian.md/).
 
 # Setup
 ```lua

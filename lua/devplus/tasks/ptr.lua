@@ -92,7 +92,7 @@ function M.deactivate()
     if M.state.line and M.state.bufnr and M.state.clock_extmark_id and M.state.arrow_extmark_id then
         pcall(vim.api.nvim_buf_del_extmark, M.state.bufnr, M.namespace, M.state.arrow_extmark_id)
         pcall(vim.api.nvim_buf_del_extmark, M.state.bufnr, M.namespace, M.state.clock_extmark_id)
-        queue.append(ingest.task_ptr_time) --revisar
+        queue.append(ingest.task_ptr_time)
         M.state = {line = nil, bufnr = nil, arrow_extmark_id = nil, clock_extmark_id = nil}
     end
 end

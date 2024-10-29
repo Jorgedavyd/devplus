@@ -15,7 +15,7 @@ local function get_ripgrep_cmd_obsidian()
     end
     table.insert(cmd, pattern)
 
-    local todo = obsidian.resolveVault()
+    local todo = vim.fn.resolve(obsidian.resolveVault() .. "/.todo.md")
     if not todo then
         logs.warning("Vault path could not be resolved.")
         return

@@ -2,7 +2,7 @@
 ---@field history table<number, Task>
 local M = {}
 
----@type table<number, Task>
+---@type Task[]
 M.history = {}
 
 ---cache.append: Adds the tasks to the buffer
@@ -24,6 +24,7 @@ function M.append(tasks)
         if flag == 0 then
             table.insert(M.history, new_task)
             _G.db.tasks.queue.append(new_task)
+            _G.obsidian.append(new_task)
         end
     end
 end
