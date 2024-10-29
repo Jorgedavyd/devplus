@@ -160,7 +160,7 @@ end
 
 --- Encodes a task inline based on format
 ---@param str string
----@return Task
+---@return Task?
 function Task.inline.encoder(str)
     local fmt, format_keys = Task.get_format()
     if fmt and format_keys then

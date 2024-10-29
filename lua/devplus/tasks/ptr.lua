@@ -9,7 +9,7 @@ local M = {}
 
 M.namespace = api.nvim_create_namespace("devplus-pointer")
 
----@class Config
+---@class PtrConfig
 ---@field line number|nil
 ---@field arrow_extmark_id number|nil
 ---@field bufnr number|nil

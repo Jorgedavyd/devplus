@@ -26,17 +26,7 @@ local default_config = {
         categories = {
             TODO = {
                 icon = "📝",
-            },
-            --[[DATA = {
-                icon = "⛁",     -- Database icon (simple)
-                -- Alternative options:
-                -- icon = "🗄️",  -- File cabinet
-                -- icon = "⛃",   -- Another database variant
-                -- icon = "🖪",   -- Technical database icon
-            },
-            TRAIN = {
-                icon = "🚂",
-            }]]--
+            }
         },
         time_format = "%y%m%d",
         ptr_virtual_text = "->",

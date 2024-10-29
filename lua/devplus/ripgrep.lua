@@ -60,11 +60,16 @@ local function get_ripgrep_cmd_inline()
 end
 
 function M.grep(callback)
-    local cmd1 = table.insert(get_ripgrep_cmd_obsidian(), "&&")
+    local cmd1 = get_ripgrep_cmd_obsidian()
     local cmd2 = get_ripgrep_cmd_inline()
-    local cmd = vim.list_extend(cmd1, cmd2)
-    if not cmd then
-        return
+    if cmd1 and cmd2 then
+        cmd1 = table.insert(cmd1, "&&")
+        local cmd = vim.list_extend(cmd1, cmd2)
+        if not cmd then
+            return
+        end
+    else
+        logs.error("Couldn\'t create the grep operation")
     end
 
     local tasks = {}
