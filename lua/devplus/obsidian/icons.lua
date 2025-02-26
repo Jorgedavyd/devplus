@@ -24,7 +24,7 @@ TaskMeta.created = "➕"        -- Creation date marker
 TaskMeta.due_date = "📅"       -- Due date marker
 TaskMeta.start_date = "🛫"     -- Start date marker
 TaskMeta.schedule_date = "⏳"  -- Schedule date marker
-TaskMeta.id = "🆔"            -- ID marker
+TaskMeta.id = "🆔"             -- ID marker
 TaskMeta.recursive = "🔁"      -- Recursive task marker
 
 TaskMeta.grep_string = ("- [ ] %s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s|➕\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)|%s\\s*\\((.-)\\)"):format(
