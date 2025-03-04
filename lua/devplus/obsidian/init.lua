@@ -1,7 +1,7 @@
 local log = require("devplus.logs")
 local template = require("devplus.obsidian.template")
 local config = _G.Config.obsidian
-local uv = vim.loop
+local uv = vim.uv
 
 local M = {}
 
@@ -37,7 +37,7 @@ end
 
 ---@return string|nil
 local function resolveProject()
-    local dir = uv.cwd()
+    local dir = vim.fn.getcwd()
     while dir do
         local git_path = dir .. "/.git"
         local stat = uv.fs_stat(git_path)
@@ -97,10 +97,15 @@ function M.setup()
         local block = template.main:gsub("{{PROJECT_PLACEHOLDER}}", project)
         local success, err = pcall(function()
             local directory = M.resolveVault()
+            if not directory then
+                log.error("Couldn't find the project path.")
+                return nil
+            end
 
             if vim.fn.isdirectory(directory) == 0 then
-                vim.fn.mkdir(directory)
+                vim.fs_mkdir(directory)
             end
+
             local main = vim.fn.resolve(directory .. '/main.md')
             local main_file = io.open(main, 'w')
             if not main_file then
